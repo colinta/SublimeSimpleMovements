@@ -85,4 +85,5 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
             nl = nl[:-len(tab)]
 
         self.view.replace(edit, region, nl)
+        self.view.show(region)
         self.view.sel().add(sublime.Region(region.end() + len(nl), region.end() + len(nl)))
