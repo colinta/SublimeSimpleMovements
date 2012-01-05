@@ -10,6 +10,7 @@ semicolon_langs = [
     'source.java',
     'source.objc',
     'source.objc++',
+    'source.shell',
     ]
 
 
