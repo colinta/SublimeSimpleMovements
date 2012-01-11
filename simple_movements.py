@@ -31,15 +31,23 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
                 new_point += 1
         self.view.sel().subtract(region)
         if extend:
-            self.view.sel().add(sublime.Region(region.a, new_point))
+            region = sublime.Region(region.a, new_point)
         else:
-            self.view.sel().add(sublime.Region(new_point, new_point))
+            region = sublime.Region(new_point, new_point)
+        self.view.sel().add(region)
+        self.view.show(region)
 
 
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         e = self.view.begin_edit('simple_movement')
         regions = [region for region in self.view.sel()]
+
+        # sort by region.end() DESC
+        def compare(region_a, region_b):
+            return cmp(region_b.end(), region_a.end())
+        regions.sort(compare)
+
         for region in regions:
             self.run_each(edit, region, **kwargs)
         self.view.end_edit(e)
