@@ -38,6 +38,84 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
         self.view.show(region)
 
 
+class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        e = self.view.begin_edit('simple_movement')
+        regions = [region for region in self.view.sel()]
+        for region in regions:
+            self.run_each(edit, region, **kwargs)
+        self.view.end_edit(e)
+
+    def run_each(self, edit, region, extend=False):
+        a = region.begin()
+        b = region.end()
+
+        row_a, col_a = self.view.rowcol(a)
+        row_b, col_b = self.view.rowcol(b)
+        if row_a == row_b:
+            return
+
+        if col_b < col_a:
+            col_a, col_b = col_b, col_a
+
+        self.view.sel().subtract(region)
+        for row in range(row_a, row_b + 1):
+            start = self.view.text_point(row, col_a)
+            end = self.view.text_point(row, col_b)
+            self.view.sel().add(sublime.Region(start, end))
+
+
+class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        e = self.view.begin_edit('simple_movement')
+        regions = [region for region in self.view.sel()]
+
+        # sort by region.end() DESC
+        def compare(region_a, region_b):
+            return cmp(region_b.end(), region_a.end())
+        regions.sort(compare)
+
+        restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
+        self.view.settings().set('translate_tabs_to_spaces', False)
+        for region in regions:
+            self.run_each(edit, region, **kwargs)
+        self.view.end_edit(e)
+        self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
+
+    def run_each(self, edit, region, insert):
+        self.view.replace(edit, region, insert)
+        self.view.show(region)
+
+
+class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        if any(region for region in self.view.sel() if self.view.rowcol(region.a)[0] != self.view.rowcol(region.b)[0]):
+            sublime.status_message('Selections that span multiple lines don\'t really make sense in simple_movement_align_cursor')
+            return
+
+        e = self.view.begin_edit('simple_movement')
+        regions = [region for region in self.view.sel()]
+
+        # sort by region.end() DESC
+        def compare(region_a, region_b):
+            return cmp(region_b.end(), region_a.end())
+        regions.sort(compare)
+
+        # find max right
+        max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
+
+        restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
+        self.view.settings().set('translate_tabs_to_spaces', False)
+        for region in regions:
+            spaces = max_right - self.view.rowcol(region.begin())[1]
+            if spaces:
+                self.view.insert(edit, region.begin(), ' ' * spaces)
+            print max_right, spaces
+
+        self.view.end_edit(e)
+        self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
+
+
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         e = self.view.begin_edit('simple_movement')

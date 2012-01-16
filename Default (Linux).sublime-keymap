@@ -1,4 +1,5 @@
 [
+{ "keys": ["ctrl+shift+b"], "command": "simple_movement_select_block" },
     { "keys": ["home"], "command": "simple_movement_bol", "args": { "extend": false } },
     { "keys": ["shift+home"], "command": "simple_movement_bol", "args": { "extend": true } },
     { "keys": ["alt+enter"], "command": "simple_movement_nl", "args": {"hard_nl": true} },
