@@ -110,7 +110,6 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
             spaces = max_right - self.view.rowcol(region.begin())[1]
             if spaces:
                 self.view.insert(edit, region.begin(), ' ' * spaces)
-            print max_right, spaces
 
         self.view.end_edit(e)
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
