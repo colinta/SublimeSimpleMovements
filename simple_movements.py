@@ -146,7 +146,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         if with_terminator:
             # each language has special rules.  tedious, but feature rich!
             if self.view.score_selector(region.b, 'source.python'):
-                keyword = self.view.find('^[ \t]*(if|elif|else|while|for|do|try|except|finally|def|class)', beginning_of_line)
+                keyword = self.view.find('^[ \t]*(if|elif|else|while|for|do|try|except|finally|def|class|with)', beginning_of_line)
                 if keyword and keyword.contains(beginning_of_line):
                     if self.view.substr(end_of_line - 1) != ':':
                         nl = ':' + nl
