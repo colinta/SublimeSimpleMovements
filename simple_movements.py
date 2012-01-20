@@ -177,7 +177,6 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         if unindent and nl[-len(tab):] == tab:
             nl = nl[:-len(tab)]
 
-        print "nl: --%s--" % nl, len(nl)
         self.view.sel().subtract(region)
         self.view.replace(edit, region, nl)
         self.view.show(region)
