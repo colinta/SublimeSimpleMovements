@@ -137,6 +137,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         self.view.end_edit(e)
 
     def run_each(self, edit, region, insert_nl=True, hard_nl=False, with_terminator=False, unindent=False):
+        self.view.sel().subtract(region)
         nl = "\n" if insert_nl else ""
 
         if self.view.settings().get('translate_tabs_to_spaces'):
@@ -177,7 +178,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         if unindent and nl[-len(tab):] == tab:
             nl = nl[:-len(tab)]
 
-        self.view.sel().subtract(region)
+        new_cursor = sublime.Region(region.begin() + len(nl), region.begin() + len(nl))
         self.view.replace(edit, region, nl)
         self.view.show(region)
-        self.view.sel().add(sublime.Region(region.begin() + len(nl), region.begin() + len(nl)))
+        self.view.sel().add(new_cursor)
