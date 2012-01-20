@@ -61,7 +61,14 @@ class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
         self.view.sel().subtract(region)
         for row in range(row_a, row_b + 1):
             start = self.view.text_point(row, col_a)
+            if self.view.rowcol(start)[0] > row:
+                # skip if the line isn't as long as start
+                continue
+
             end = self.view.text_point(row, col_b)
+            while self.view.rowcol(end)[0] > row:
+                # shorten if the line isn't as long as end
+                end -= 1
             self.view.sel().add(sublime.Region(start, end))
 
 
@@ -130,8 +137,6 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         self.view.end_edit(e)
 
     def run_each(self, edit, region, insert_nl=True, hard_nl=False, with_terminator=False, unindent=False):
-        self.view.sel().subtract(region)
-
         nl = "\n" if insert_nl else ""
 
         if self.view.settings().get('translate_tabs_to_spaces'):
@@ -172,6 +177,8 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         if unindent and nl[-len(tab):] == tab:
             nl = nl[:-len(tab)]
 
+        print "nl: --%s--" % nl, len(nl)
+        self.view.sel().subtract(region)
         self.view.replace(edit, region, nl)
         self.view.show(region)
-        self.view.sel().add(sublime.Region(region.end() + len(nl), region.end() + len(nl)))
+        self.view.sel().add(sublime.Region(region.begin() + len(nl), region.begin() + len(nl)))
