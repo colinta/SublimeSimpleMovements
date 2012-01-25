@@ -169,10 +169,10 @@ class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
 
     def run_each(self, edit, region, insert):
-        if region.empty():
-            self.view.insert(edit, region.a, insert)
-        else:
-            self.view.replace(edit, region, insert)
+        self.view.replace(edit, region, '')
+        self.view.insert(edit, region.a, insert)
+        self.view.sel().subtract(region)
+        self.view.sel().add(sublime.Region(region.a + len(insert), region.a + len(insert)))
         self.view.show(region)
 
 
