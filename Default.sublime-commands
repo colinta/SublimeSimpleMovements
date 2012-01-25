@@ -1,2 +1,27 @@
 [
+    {
+        "caption": "Goto Line",
+        "command": "simple_movement_goto_line"
+    },
+    {
+        "caption": "Convert Selection to Block",
+        "command": "simple_movement_select_block"
+    },
+    {
+        "caption": "Align cursor",
+        "command": "simple_movement_align_cursor"
+    },
+    {
+        "caption": "Goto Beginning of Line",
+        "command": "simple_movement_bol"
+    },
+    {
+        "caption": "Insert newline without indenting",
+        "command": "simple_movement_nl"
+    },
+    {
+        "caption": "Insert a literal tab",
+        "command": "simple_movement_insert",
+        "args": { "insert": "\t" }
+    }
 ]
