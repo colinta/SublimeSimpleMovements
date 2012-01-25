@@ -11,6 +11,7 @@ semicolon_langs = [
     'source.objc',
     'source.objc++',
     'source.shell',
+    'source.css',
     ]
 
 
@@ -23,7 +24,7 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
         self.view.end_edit(e)
 
     def run_each(self, edit, region, extend=False):
-        row, col = self.view.rowcol(region.b)
+        row, col = self.view.rowcol(region.begin())
         new_point = self.view.text_point(row, 0)
         if new_point == region.b:
             # already at BOL, skip to first character
@@ -36,6 +37,84 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
             region = sublime.Region(new_point, new_point)
         self.view.sel().add(region)
         self.view.show(region)
+
+
+class SimpleMovementGotoLineCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        last_region = self.view.sel()[-1]
+        self.cursor = self.view.rowcol(last_region.b)[1]
+        # the row of the beginning of the line that contains the beginning of the last region
+        self.first_line = self.view.rowcol(self.view.line(last_region.begin()).begin())[0]
+        self.start_regions = [region for region in self.view.sel()]
+        self.view.window().show_input_panel('Line(s):', '', self.goto_line, None, self.restore)
+
+    def goto_line(self, text):
+        if not len(text):
+            self.restore()
+            return
+
+        try:
+            if ',' in text:
+                # supported multiline syntax:
+                # a,b  =>  lines a to b
+                # a,  => just line a
+                # ,b  => current line to line b
+                # ,  => just current line
+                line_a, line_b = text.split(',')
+                if not line_a:
+                    # ,b
+                    line_a = self.first_line + 1
+                else:
+                    line_a = self.get_line(line_a)
+
+                if line_b:
+                    line_b = self.get_line(line_b)
+                else:
+                    line_b = line_a
+                # b += 1 so that selection includes all of b
+                line_b += 1
+                print line_a, line_b
+            else:
+                line_a = line_b = self.get_line(text)
+        except ValueError:
+            sublime.status_message('Invalid entry')
+            self.restore()
+            return
+
+        # 0-index
+        line_a -= 1
+        line_b -= 1
+        if line_b == line_a:
+            start = end = self.view.text_point(line_a, self.cursor)
+            too_far = self.view.text_point(line_a + 1, 0)
+            if start >= too_far:
+                start = end = too_far - 1
+        else:
+            start = self.view.text_point(line_a, 0)
+            end = self.view.text_point(line_b, 0)
+
+        if start < 0 or end < 0 or start >= self.view.size() or end >= self.view.size():
+            sublime.status_message('Invalid entry')
+            self.restore()
+            return
+
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(start, end))
+        self.view.show_at_center(sublime.Region(start, end))
+
+    def restore(self):
+        for region in self.start_regions:
+            self.view.sel().add(region)
+
+    def get_line(self, line):
+        if line[0] == '+':
+            return self.first_line + int(line[1:]) + 1
+        elif line[0] == '-':
+            return self.first_line - int(line[1:]) + 1
+        elif line == '0':
+            return self.first_line + 1
+        else:
+            return int(line)
 
 
 class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
@@ -90,7 +169,10 @@ class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
 
     def run_each(self, edit, region, insert):
-        self.view.replace(edit, region, insert)
+        if region.empty():
+            self.view.insert(edit, region.a, insert)
+        else:
+            self.view.replace(edit, region, insert)
         self.view.show(region)
 
 
