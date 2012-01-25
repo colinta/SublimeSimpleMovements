@@ -1,5 +1,5 @@
 [
-    // { "keys": ["super+l"], "command": "simple_movement_goto_line" },
+    { "keys": ["super+l"], "command": "simple_movement_goto_line" },
     { "keys": ["ctrl+shift+b"], "command": "simple_movement_select_block" },
     { "keys": ["super+ctrl+="], "command": "simple_movement_align_cursor" },
     { "keys": ["super+left"], "command": "simple_movement_bol", "args": {"extend": false} },
@@ -7,5 +7,17 @@
     { "keys": ["alt+enter"], "command": "simple_movement_nl", "args": {"hard_nl": true} },
     { "keys": ["ctrl+enter"], "command": "simple_movement_nl", "args": {"unindent": true} },
     { "keys": ["ctrl+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true} },
-    { "keys": ["super+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true, "insert_nl": false} }
+    { "keys": ["super+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true, "insert_nl": false} },
+    //|  insert literal characters
+    { "keys": ["ctrl+v","tab"], "command": "simple_movement_insert", "args": { "insert": "\t" } },
+    { "keys": ["ctrl+v","'"], "command": "simple_movement_insert", "args": { "insert": "'" } },
+    { "keys": ["ctrl+v","\""], "command": "simple_movement_insert", "args": { "insert": "\"" } },
+    { "keys": ["ctrl+v","("], "command": "simple_movement_insert", "args": { "insert": "(" } },
+    { "keys": ["ctrl+v","["], "command": "simple_movement_insert", "args": { "insert": "[" } },
+    { "keys": ["ctrl+v","{"], "command": "simple_movement_insert", "args": { "insert": "{" } },
+    { "keys": ["ctrl+v","“"], "command": "simple_movement_insert", "args": { "insert": "“" } },
+    { "keys": ["ctrl+v","‘"], "command": "simple_movement_insert", "args": { "insert": "‘" } },
+    { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },
+    { "keys": ["ctrl+v","«"], "command": "simple_movement_insert", "args": { "insert": "«" } },
+    { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } }
 ]
