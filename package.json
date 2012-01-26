@@ -1,0 +1,7 @@
+{
+  "repo": "SublimeSimpleMovements",
+  "name": "SimpleMovements",
+  "description": "Adds caret moving and newline entering commands.",
+  "author": "Colin Thomas-Arnold (colinta)",
+  "homepage": "https://github.com/colinta/SublimeSimpleMovements"
+}
