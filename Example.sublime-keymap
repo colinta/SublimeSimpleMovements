@@ -1,4 +1,5 @@
 [
+    { "keys": ["super+shift+d"], "command": "simple_movement_duplicate_line" },
     { "keys": ["super+l"], "command": "simple_movement_goto_line" },
     { "keys": ["ctrl+shift+b"], "command": "simple_movement_select_block" },
     { "keys": ["super+ctrl+="], "command": "simple_movement_align_cursor" },
@@ -14,8 +15,11 @@
     { "keys": ["ctrl+v","\""], "command": "simple_movement_insert", "args": { "insert": "\"" } },
     { "keys": ["ctrl+v","`"], "command": "simple_movement_insert", "args": { "insert": "`" } },
     { "keys": ["ctrl+v","("], "command": "simple_movement_insert", "args": { "insert": "(" } },
+    { "keys": ["ctrl+v",")"], "command": "simple_movement_insert", "args": { "insert": ")" } },
     { "keys": ["ctrl+v","["], "command": "simple_movement_insert", "args": { "insert": "[" } },
+    { "keys": ["ctrl+v","]"], "command": "simple_movement_insert", "args": { "insert": "]" } },
     { "keys": ["ctrl+v","{"], "command": "simple_movement_insert", "args": { "insert": "{" } },
+    { "keys": ["ctrl+v","}"], "command": "simple_movement_insert", "args": { "insert": "}" } },
     { "keys": ["ctrl+v","“"], "command": "simple_movement_insert", "args": { "insert": "“" } },
     { "keys": ["ctrl+v","‘"], "command": "simple_movement_insert", "args": { "insert": "‘" } },
     { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },

@@ -39,7 +39,81 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
         self.view.show(region)
 
 
-class SimpleMovementGotoLineCommand(sublime_plugin.TextCommand):
+class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
+    def get_line(self, line):
+        if line[0] == '+':
+            return self.first_line + int(line[1:])
+        elif line[0] == '-':
+            return self.first_line - int(line[1:])
+        elif line == '0':
+            return self.first_line
+        else:
+            return int(line) - 1
+
+    def get_two_lines(self, text, c):
+        # supported multiline syntax:
+        # a,b  =>  lines a to b
+        # a,  => just line a
+        # ,b  => current line to line b
+        # ,  => just current line
+        line_a, line_b = text.split(c)
+        if not line_a:
+            # ,b
+            line_a = self.first_line
+        else:
+            line_a = self.get_line(line_a)
+
+        if line_b:
+            line_b = self.get_line(line_b)
+        else:
+            line_b = line_a
+        # b += 1 so that selection includes all of b
+        line_b += 1
+
+        return line_a, line_b
+
+
+class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
+    def run(self, edit, **kwargs):
+        last_region = self.view.sel()[-1]
+        self.cursor = self.view.rowcol(last_region.b)[1]
+        # the row of the beginning of the line that contains the beginning of the last region
+        self.first_line = self.view.rowcol(self.view.line(last_region.begin()).begin())[0]
+        self.view.window().show_input_panel('Line(s):', '', self.duplicate_line, None, None)
+
+    def duplicate_line(self, lines):
+        if not len(lines):
+            lines = str(self.first_line)
+
+        try:
+            if ',' in lines:
+                line_a, line_b = self.get_two_lines(lines, ',')
+            else:
+                line_a = self.get_line(lines)
+                line_b = line_a + 1
+        except ValueError as e:
+            sublime.status_message('Invalid entry')
+            return
+
+        # get content between lines line_a and line_b
+        a = self.view.text_point(line_a, 0)
+        b = self.view.text_point(line_b, 0)
+        content = self.view.substr(sublime.Region(a, b))
+
+        regions = [region for region in self.view.sel()]
+
+        # sort by region.end() DESC
+        def compare(region_a, region_b):
+            return cmp(region_b.end(), region_a.end())
+        regions.sort(compare)
+
+        e = self.view.begin_edit('simple_movement')
+        for region in regions:
+            self.view.replace(e, region, content)
+        self.view.end_edit(e)
+
+
+class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
     def run(self, edit, **kwargs):
         last_region = self.view.sel()[-1]
         self.cursor = self.view.rowcol(last_region.b)[1]
@@ -48,52 +122,32 @@ class SimpleMovementGotoLineCommand(sublime_plugin.TextCommand):
         self.start_regions = [region for region in self.view.sel()]
         self.view.window().show_input_panel('Line(s):', '', self.goto_line, None, self.restore)
 
-    def goto_line(self, text):
-        if not len(text):
+    def goto_line(self, lines):
+        if not len(lines):
             self.restore()
             return
 
         try:
-            if ',' in text:
-                # supported multiline syntax:
-                # a,b  =>  lines a to b
-                # a,  => just line a
-                # ,b  => current line to line b
-                # ,  => just current line
-                line_a, line_b = text.split(',')
-                if not line_a:
-                    # ,b
-                    line_a = self.first_line + 1
-                else:
-                    line_a = self.get_line(line_a)
-
-                if line_b:
-                    line_b = self.get_line(line_b)
-                else:
-                    line_b = line_a
-                # b += 1 so that selection includes all of b
-                line_b += 1
-                print line_a, line_b
+            if ',' in lines:
+                line_a, line_b = self.get_two_lines(lines, ',')
             else:
-                line_a = line_b = self.get_line(text)
+                line_a = line_b = self.get_line(lines)
         except ValueError:
             sublime.status_message('Invalid entry')
             self.restore()
             return
 
-        # 0-index
-        line_a -= 1
-        line_b -= 1
         if line_b == line_a:
-            start = end = self.view.text_point(line_a, self.cursor)
+            start = self.view.text_point(line_a, self.cursor)
             too_far = self.view.text_point(line_a + 1, 0)
             if start >= too_far:
-                start = end = too_far - 1
+                start = too_far - 1
+            end = start
         else:
             start = self.view.text_point(line_a, 0)
             end = self.view.text_point(line_b, 0)
 
-        if start < 0 or end < 0 or start >= self.view.size() or end >= self.view.size():
+        if start < 0 or end < 0 or start > self.view.size() or end > self.view.size():
             sublime.status_message('Invalid entry')
             self.restore()
             return
@@ -103,18 +157,9 @@ class SimpleMovementGotoLineCommand(sublime_plugin.TextCommand):
         self.view.show_at_center(sublime.Region(start, end))
 
     def restore(self):
+        self.view.sel().clear()
         for region in self.start_regions:
             self.view.sel().add(region)
-
-    def get_line(self, line):
-        if line[0] == '+':
-            return self.first_line + int(line[1:]) + 1
-        elif line[0] == '-':
-            return self.first_line - int(line[1:]) + 1
-        elif line == '0':
-            return self.first_line + 1
-        else:
-            return int(line)
 
 
 class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
