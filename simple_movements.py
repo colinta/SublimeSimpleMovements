@@ -1,3 +1,4 @@
+import re
 import sublime
 import sublime_plugin
 
@@ -222,7 +223,7 @@ class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
 
 
 class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
-    def run(self, edit, **kwargs):
+    def run(self, edit, move="right"):
         if any(region for region in self.view.sel() if self.view.rowcol(region.a)[0] != self.view.rowcol(region.b)[0]):
             sublime.status_message('Selections that span multiple lines don\'t really make sense in simple_movement_align_cursor')
             return
@@ -236,17 +237,26 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
         regions.sort(compare)
 
         # find max right
-        max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
-
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
-        for region in regions:
-            spaces = max_right - self.view.rowcol(region.begin())[1]
-            if spaces:
-                self.view.insert(edit, region.begin(), ' ' * spaces)
+        if move == "left":
+            min_right = min(self.view.rowcol(region.begin())[1] for region in regions)
 
-        self.view.end_edit(e)
+            for region in regions:
+                spaces = self.view.rowcol(region.begin())[1] - min_right
+                replace_region = sublime.Region(region.begin() - spaces, region.begin())
+                if spaces and self.view.substr(replace_region) == ' ' * spaces:
+                    self.view.replace(edit, replace_region, '')
+        else:
+            max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
+
+            for region in regions:
+                spaces = max_right - self.view.rowcol(region.begin())[1]
+                if spaces:
+                    self.view.insert(edit, region.begin(), ' ' * spaces)
+
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
+        self.view.end_edit(e)
 
 
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
