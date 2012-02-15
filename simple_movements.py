@@ -83,22 +83,7 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
 
     def duplicate_line(self, lines):
         if not len(lines):
-            lines = str(self.first_line)
-
-        try:
-            if ',' in lines:
-                line_a, line_b = self.get_two_lines(lines, ',')
-            else:
-                line_a = self.get_line(lines)
-                line_b = line_a + 1
-        except ValueError as e:
-            sublime.status_message('Invalid entry')
-            return
-
-        # get content between lines line_a and line_b
-        a = self.view.text_point(line_a, 0)
-        b = self.view.text_point(line_b, 0)
-        content = self.view.substr(sublime.Region(a, b))
+            lines = "-1"
 
         regions = [region for region in self.view.sel()]
 
@@ -109,6 +94,23 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
 
         e = self.view.begin_edit('simple_movement')
         for region in regions:
+            self.first_line = self.view.rowcol(self.view.line(region.begin()).begin())[0]
+
+            try:
+                if ',' in lines:
+                    line_a, line_b = self.get_two_lines(lines, ',')
+                else:
+                    line_a = self.get_line(lines)
+                    line_b = line_a + 1
+            except ValueError as e:
+                sublime.status_message('Invalid entry')
+                return
+
+            # get content between lines line_a and line_b
+            a = self.view.text_point(line_a, 0)
+            b = self.view.text_point(line_b, 0)
+            content = self.view.substr(sublime.Region(a, b))
+
             self.view.replace(e, region, content)
         self.view.end_edit(e)
 
