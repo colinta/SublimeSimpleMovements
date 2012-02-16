@@ -24,7 +24,7 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
         self.view.end_edit(e)
 
     def run_each(self, edit, region, extend=False):
-        row, col = self.view.rowcol(region.begin())
+        row, col = self.view.rowcol(region.b)
         new_point = self.view.text_point(row, 0)
         if new_point == region.b:
             # already at BOL, skip to first character
@@ -67,7 +67,7 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
             line_b = self.get_line(line_b)
         else:
             line_b = line_a
-        # b += 1 so that selection includes all of b
+
         line_b += 1
 
         return line_a, line_b
