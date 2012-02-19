@@ -217,9 +217,9 @@ class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
 
     def run_each(self, edit, region, insert):
         self.view.replace(edit, region, '')
-        self.view.insert(edit, region.a, insert)
+        self.view.insert(edit, region.begin(), insert)
         self.view.sel().subtract(region)
-        self.view.sel().add(sublime.Region(region.a + len(insert), region.a + len(insert)))
+        self.view.sel().add(sublime.Region(region.begin() + len(insert), region.begin() + len(insert)))
         self.view.show(region)
 
 
