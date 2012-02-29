@@ -24,8 +24,8 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
         self.view.end_edit(e)
 
     def run_each(self, edit, region, extend=False):
-        row, col = self.view.rowcol(region.b)
-        new_point = self.view.text_point(row, 0)
+        line = self.view.line(region.b)
+        new_point = line.begin()
         if new_point == region.b:
             # already at BOL, skip to first character
             while self.view.substr(new_point) in [" ", "\t"]:
