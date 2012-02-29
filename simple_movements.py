@@ -156,7 +156,11 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
 
         self.view.sel().clear()
         self.view.sel().add(sublime.Region(start, end))
+        pos = self.view.viewport_position()
         self.view.show_at_center(sublime.Region(start, end))
+        new_pos = self.view.viewport_position()
+        if abs(new_pos[0] - pos[0]) <= 1.0 and abs(new_pos[1] - pos[1]) <= 1.0:
+            self.view.set_viewport_position((new_pos[0], new_pos[1] + 1))
 
     def restore(self):
         self.view.sel().clear()
