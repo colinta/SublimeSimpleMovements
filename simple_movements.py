@@ -1,3 +1,4 @@
+import time
 import sublime
 import sublime_plugin
 
@@ -122,7 +123,17 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         # the row of the beginning of the line that contains the beginning of the last region
         self.first_line = self.view.rowcol(self.view.line(last_region.begin()).begin())[0]
         self.start_regions = [region for region in self.view.sel()]
-        self.view.window().show_input_panel('Line(s):', '', self.goto_line, None, self.restore)
+        self.view.window().show_input_panel('Line(s):', '', self.goto_line, self.demo_line, self.restore)
+
+    def demo_line(self, lines):
+        self.started = time.time()
+
+        def okay_go():
+            print time.time() - self.started
+            print time.time() - self.started > .270
+            if time.time() - self.started > .270:
+                self.goto_line(lines)
+        sublime.set_timeout(okay_go, 300)
 
     def goto_line(self, lines):
         if not len(lines):
@@ -135,7 +146,6 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
             else:
                 line_a = line_b = self.get_line(lines)
         except ValueError:
-            sublime.status_message('Invalid entry')
             self.restore()
             return
 
@@ -161,6 +171,7 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         new_pos = self.view.viewport_position()
         if abs(new_pos[0] - pos[0]) <= 1.0 and abs(new_pos[1] - pos[1]) <= 1.0:
             self.view.set_viewport_position((new_pos[0], new_pos[1] + 1))
+            self.view.set_viewport_position((new_pos[0], new_pos[1]))
 
     def restore(self):
         self.view.sel().clear()
