@@ -40,6 +40,31 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
         self.view.show(region)
 
 
+class SimpleMovementEolCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        e = self.view.begin_edit('simple_movement')
+        regions = [region for region in self.view.sel()]
+        for region in regions:
+            self.run_each(edit, region, **kwargs)
+        self.view.end_edit(e)
+
+    def run_each(self, edit, region, extend=False):
+        line = self.view.line(region.b)
+        new_point = line.end()
+        if new_point == region.b:
+            # already at EOL, skip to first character
+            new_point = line.begin()
+            while self.view.substr(new_point) in [" ", "\t"]:
+                new_point += 1
+        self.view.sel().subtract(region)
+        if extend:
+            region = sublime.Region(region.a, new_point)
+        else:
+            region = sublime.Region(new_point, new_point)
+        self.view.sel().add(region)
+        self.view.show(region)
+
+
 class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
     def get_line(self, line):
         if line[0] == '+':
