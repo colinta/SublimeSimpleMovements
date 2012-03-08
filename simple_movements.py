@@ -129,8 +129,6 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         self.started = time.time()
 
         def okay_go():
-            print time.time() - self.started
-            print time.time() - self.started > .270
             if time.time() - self.started > .270:
                 self.goto_line(lines)
         sublime.set_timeout(okay_go, 300)
