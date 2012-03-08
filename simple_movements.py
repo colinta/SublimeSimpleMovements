@@ -53,9 +53,9 @@ class SimpleMovementEolCommand(sublime_plugin.TextCommand):
         new_point = line.end()
         if new_point == region.b:
             # already at EOL, skip to first character
-            new_point = line.begin()
-            while self.view.substr(new_point) in [" ", "\t"]:
-                new_point += 1
+            new_point = line.end()
+            while self.view.substr(new_point - 1) in [" ", "\t"]:
+                new_point -= 1
         self.view.sel().subtract(region)
         if extend:
             region = sublime.Region(region.a, new_point)
