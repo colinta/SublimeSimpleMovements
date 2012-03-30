@@ -13,6 +13,7 @@
     { "keys": ["ctrl+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true} },
     { "keys": ["super+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true, "insert_nl": false} },
     //|  insert literal characters
+    { "keys": ["ctrl+v","enter"], "command": "simple_movement_insert", "args": { "insert": "\n" } },
     { "keys": ["ctrl+v","tab"], "command": "simple_movement_insert", "args": { "insert": "\t" } },
     { "keys": ["ctrl+v","'"], "command": "simple_movement_insert", "args": { "insert": "'" } },
     { "keys": ["ctrl+v","\""], "command": "simple_movement_insert", "args": { "insert": "\"" } },

@@ -275,6 +275,8 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
             return cmp(region_b.end(), region_a.end())
         regions.sort(compare)
 
+        cursors = []
+
         # find max right
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
@@ -286,6 +288,10 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
                 replace_region = sublime.Region(region.begin() - spaces, region.begin())
                 if spaces and self.view.substr(replace_region) == ' ' * spaces:
                     self.view.replace(edit, replace_region, '')
+                    # adjust previously saved cursors by `spaces`
+                    for i, cursor in enumerate(cursors):
+                        cursors[i] = sublime.Region(cursor.begin() - spaces, cursor.begin() - spaces)
+                    cursors.append(sublime.Region(replace_region.begin(), replace_region.begin()))
         else:
             max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
 
@@ -293,7 +299,14 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
                 spaces = max_right - self.view.rowcol(region.begin())[1]
                 if spaces:
                     self.view.insert(edit, region.begin(), ' ' * spaces)
+                    for i, cursor in enumerate(cursors):
+                        cursors[i] = sublime.Region(cursor.begin() + spaces, cursor.begin() + spaces)
+                    cursors.append(sublime.Region(region.begin() + spaces, region.begin() + spaces))
 
+        if cursors:
+            self.view.sel().clear()
+            for cursor in cursors:
+                self.view.sel().add(cursor)
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
         self.view.end_edit(e)
 
