@@ -341,6 +341,12 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         beginning_of_line = line.begin()
         end_of_line = line.end()
 
+        if with_comment:
+            # test validity of "with_comment" - if the line does not *start*
+            # with a comment, forget it.
+            after_whitespace = self.view.find(r'^\s*', beginning_of_line).end()
+            with_comment = bool(self.view.score_selector(after_whitespace, 'comment'))
+
         if with_terminator:
             # each language has special rules.  tedious, but feature rich!
             if self.view.score_selector(region.b, 'source.python'):
