@@ -1,4 +1,5 @@
 import time
+import re
 import sublime
 import sublime_plugin
 
@@ -325,7 +326,8 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
             self.run_each(edit, region, **kwargs)
         self.view.end_edit(e)
 
-    def run_each(self, edit, region, insert_nl=True, hard_nl=False, with_terminator=False, unindent=False):
+    def run_each(self, edit, region, insert_nl=True, hard_nl=False,
+                 with_terminator=False, unindent=False, with_comment=False):
         self.view.sel().subtract(region)
         nl = "\n" if insert_nl else ""
 
@@ -335,13 +337,14 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
             tab = "\t"
 
         row, col = self.view.rowcol(region.end())
-        beginning_of_line = self.view.text_point(row, 0)
-        end_of_line = self.view.find("$", region.end()).end()
+        line = self.view.line(region.end())
+        beginning_of_line = line.begin()
+        end_of_line = line.end()
 
         if with_terminator:
             # each language has special rules.  tedious, but feature rich!
             if self.view.score_selector(region.b, 'source.python'):
-                keyword = self.view.find('^[ \t]*(if|elif|else|while|for|do|try|except|finally|def|class|with)', beginning_of_line)
+                keyword = self.view.find(r'^[ \t]*(if|elif|else|while|for|do|try|except|finally|def|class|with)', beginning_of_line)
                 if keyword and keyword.contains(beginning_of_line):
                     if self.view.substr(end_of_line - 1) != ':':
                         nl = ':' + nl
@@ -363,8 +366,24 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
                 indent = self.view.substr(indent_region)
                 nl += indent
 
+        if with_comment:
+            # test
+            comment_range = self.view.find(r'\/?(#+|[*]|//+|--+|[\']+)\|? *', beginning_of_line)
+            if comment_range.end() == end_of_line and unindent:
+                # remove comment!
+                space = self.view.find(r'^\s*', beginning_of_line)
+                spaces = self.view.substr(space)
+                self.view.replace(edit, line, spaces)
+                new_cursor = sublime.Region(line.begin() + len(spaces))
+                self.view.sel().add(new_cursor)
+                return
+            elif not unindent:
+                comment = self.view.substr(comment_range)
+                if re.match(r'\/\*', comment):
+                    comment = ' ' + comment[1:] + ' '
+                nl += comment
         # remove "tab" from next line
-        if unindent and nl[-len(tab):] == tab:
+        elif unindent and nl[-len(tab):] == tab:
             nl = nl[:-len(tab)]
 
         new_cursor = sublime.Region(region.begin() + len(nl), region.begin() + len(nl))

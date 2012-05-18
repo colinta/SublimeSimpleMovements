@@ -8,14 +8,25 @@
     { "keys": ["super+shift+left"], "command": "simple_movement_bol", "args": {"extend": true} },
     { "keys": ["super+right"], "command": "simple_movement_eol", "args": {"extend": false} },
     { "keys": ["super+shift+right"], "command": "simple_movement_eol", "args": {"extend": true} },
-    { "keys": ["alt+enter"], "command": "simple_movement_nl", "args": {"hard_nl": true} },
+    { "keys": ["enter"], "command": "simple_movement_nl", "args": {"with_comment": true}, "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "comment" }
+        ]
+    },
     { "keys": ["ctrl+enter"], "command": "simple_movement_nl", "args": {"unindent": true} },
+    { "keys": ["ctrl+enter"], "command": "simple_movement_nl", "args": {"with_comment": true, "unindent": true}, "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "comment" }
+        ]
+    },
+    { "keys": ["alt+enter"], "command": "simple_movement_nl", "args": {"hard_nl": true} },
     { "keys": ["ctrl+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true} },
     { "keys": ["super+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true, "insert_nl": false} },
     //|  insert literal characters
     { "keys": ["ctrl+v","enter"], "command": "simple_movement_insert", "args": { "insert": "\n" } },
     { "keys": ["ctrl+v","tab"], "command": "simple_movement_insert", "args": { "insert": "\t" } },
     { "keys": ["ctrl+v","'"], "command": "simple_movement_insert", "args": { "insert": "'" } },
+    { "keys": ["ctrl+v","*"], "command": "simple_movement_insert", "args": { "insert": "*" } },
     { "keys": ["ctrl+v","\""], "command": "simple_movement_insert", "args": { "insert": "\"" } },
     { "keys": ["ctrl+v","`"], "command": "simple_movement_insert", "args": { "insert": "`" } },
     { "keys": ["ctrl+v","("], "command": "simple_movement_insert", "args": { "insert": "(" } },
@@ -30,5 +41,6 @@
     { "keys": ["ctrl+v","«"], "command": "simple_movement_insert", "args": { "insert": "«" } },
     { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } },
     { "keys": ["ctrl+v","#"], "command": "simple_movement_insert", "args": { "insert": "#" } },
+    { "keys": ["ctrl+v","="], "command": "simple_movement_insert", "args": { "insert": "=" } },
     { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } }
 ]
