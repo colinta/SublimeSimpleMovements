@@ -67,6 +67,9 @@ class SimpleMovementEolCommand(sublime_plugin.TextCommand):
 
 
 class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
+    """
+    Base class for SimpleMovementDuplicateLineCommand and SimpleMovementGotoLineCommand
+    """
     def get_line(self, line):
         if line[0] == '+':
             return self.first_line + int(line[1:])
@@ -336,14 +339,16 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         else:
             tab = "\t"
 
+        original_region = sublime.Region(region.a, region.b)
         row, col = self.view.rowcol(region.end())
         line = self.view.line(region.end())
         beginning_of_line = line.begin()
         end_of_line = line.end()
+        new_cursor_offset = 0
 
         if with_comment:
             # test validity of "with_comment" - if the line does not *start*
-            # with a comment, forget it.
+            # with a comment (after whitespace), forget it.
             after_whitespace = self.view.find(r'^\s*', beginning_of_line).end()
             with_comment = bool(self.view.score_selector(after_whitespace, 'comment'))
 
@@ -383,16 +388,28 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
                 new_cursor = sublime.Region(line.begin() + len(spaces))
                 self.view.sel().add(new_cursor)
                 return
-            elif not unindent:
+
+            if not unindent:
                 comment = self.view.substr(comment_range)
                 if re.match(r'\/\*', comment):
                     comment = ' ' + comment[1:] + ' '
                 nl += comment
+
+            if original_region.end() != end_of_line:
+                remove = sublime.Region(original_region.end(), end_of_line)
+                copy = self.view.substr(remove)
+                self.view.replace(edit, remove, "")
+                region = sublime.Region(region.a - len(copy), region.b - len(copy))
+                copy = copy.strip()
+
+                nl += copy
+                new_cursor_offset -= len(copy)
         # remove "tab" from next line
         elif unindent and nl[-len(tab):] == tab:
             nl = nl[:-len(tab)]
 
-        new_cursor = sublime.Region(region.begin() + len(nl), region.begin() + len(nl))
+        new_cursor = region.begin() + len(nl) + new_cursor_offset
+        new_cursor = sublime.Region(new_cursor, new_cursor)
         self.view.replace(edit, region, nl)
         self.view.show(region)
         self.view.sel().add(new_cursor)
