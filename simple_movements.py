@@ -413,3 +413,45 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         self.view.replace(edit, region, nl)
         self.view.show(region)
         self.view.sel().add(new_cursor)
+
+
+class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, select_all=False):
+        e = self.view.begin_edit('simple_movement')
+        regions = [region for region in self.view.sel()]
+
+        # sort by region.end() DESC
+        def compare(region_a, region_b):
+            return cmp(region_b.end(), region_a.end())
+        regions.sort(compare)
+
+        if len(regions) == 1 and len(regions[0]) == 0:
+            self.view.run_command('expand_selection', {'to': 'word'})
+        else:
+            previous_region = None
+            previous_match = None
+            for region in regions:
+                match = self.view.substr(region)
+                self.select_next(region, match, previous_region, previous_match, select_all=select_all)
+                previous_region = region
+                previous_match = match
+            self.select_next(region, match, previous_region, previous_match, select_all=select_all)
+        self.view.end_edit(e)
+
+    def select_next(self, region, match, previous_region, previous_match, select_all):
+        if match == previous_match:
+            return
+
+        if select_all:
+            found_all = self.view.find_all(match, sublime.LITERAL)
+
+            if found_all:
+                for found in found_all:
+                    self.view.sel().add(found)
+        else:
+            found = self.view.find(match, region.end(), sublime.LITERAL)
+
+            if found:
+                self.view.sel().add(found)
+                self.view.show(found)
