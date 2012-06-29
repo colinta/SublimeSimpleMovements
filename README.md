@@ -24,7 +24,7 @@ Commands
 
 `simple_movement_bol`: Moves the caret to the beginning of the line.
 
-`simple_movement_nl`: Inserts a newline, or moves caret to end of line.  Can also insert line-ending characters and unindent.
+`simple_movement_eol`: Moves the caret to the end of the line.
 
 `simple_movement_insert`: Inserts a character.  Used to insert literal quotes, tabs, anything.
 
@@ -34,9 +34,19 @@ Commands
 
 `simple_movement_goto_line`: Can be given a line number or line numbers, and that will become the selection.
 
+`simple_movement_duplicate_line`: Takes the same arguments as `simple_movement_goto_line` and copies those lines to the current cursor.  Try `-1` to duplicate the line above.
+
+goto_line and duplicate_line both support cool line selection tricks:
+
 * `123`: Goes to line 123
 * `123,`: Goes to line 123 and selects it
 * `123,125`: Selects lines 123-125
 * `-1,+1`: Selects one line up, the current line, and one line below
 
-`simple_movement_duplicate_line`: Takes the same arguments as `simple_movement_goto_line` and copies those lines to the current cursor.  Try `-1` to duplicate the line above.
+The duplicate line command supports all these, but duplicates those lines at the *current* cursor location rather than moving the cursor.
+
+`simple_movement_nl`: Inserts a newline, or moves caret to end of line.  Can also insert line-ending characters and unindent.
+
+Honestly, this command does a ton of stuff.  If you want to use it, you should probably talk to me...
+
+`simple_movement_select_next`: At one point, some version of Sublime Text changed how "Quick Find Next" worked.  And besides, I always want it to select entire words, not just "the current selection".
