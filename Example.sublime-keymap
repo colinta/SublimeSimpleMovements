@@ -1,4 +1,6 @@
 [
+    { "keys": ["super+d"], "command": "simple_movement_select_next" },
+    { "keys": ["super+ctrl+g"], "command": "simple_movement_select_next", "args": {"select_all": true} },
     { "keys": ["super+shift+d"], "command": "simple_movement_duplicate_line" },
     { "keys": ["super+l"], "command": "simple_movement_goto_line" },
     { "keys": ["ctrl+shift+b"], "command": "simple_movement_select_block" },
