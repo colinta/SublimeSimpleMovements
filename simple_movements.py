@@ -380,20 +380,21 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         if with_comment:
             # test
             comment_range = self.view.find(r'\/?(#+|[*]|//+|--+|[\']+)\|? *', beginning_of_line)
-            if comment_range.end() == end_of_line and unindent:
-                # remove comment!
-                space = self.view.find(r'^\s*', beginning_of_line)
-                spaces = self.view.substr(space)
-                self.view.replace(edit, line, spaces)
-                new_cursor = sublime.Region(line.begin() + len(spaces))
-                self.view.sel().add(new_cursor)
-                return
+            if comment_range:
+                if comment_range.end() == end_of_line and unindent:
+                    # remove comment!
+                    space = self.view.find(r'^\s*', beginning_of_line)
+                    spaces = self.view.substr(space)
+                    self.view.replace(edit, line, spaces)
+                    new_cursor = sublime.Region(line.begin() + len(spaces))
+                    self.view.sel().add(new_cursor)
+                    return
 
-            if not unindent:
-                comment = self.view.substr(comment_range)
-                if re.match(r'\/\*', comment):
-                    comment = ' ' + comment[1:] + ' '
-                nl += comment
+                if not unindent:
+                    comment = self.view.substr(comment_range)
+                    if re.match(r'\/\*', comment):
+                        comment = ' ' + comment[1:] + ' '
+                    nl += comment
 
             if original_region.end() != end_of_line:
                 remove = sublime.Region(original_region.end(), end_of_line)
@@ -455,3 +456,5 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
             if found:
                 self.view.sel().add(found)
                 self.view.show(found)
+            else:
+                sublime.status_message('Cound not find "{0}"'.format(match))
