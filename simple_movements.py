@@ -296,6 +296,17 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
                     for i, cursor in enumerate(cursors):
                         cursors[i] = sublime.Region(cursor.begin() - spaces, cursor.begin() - spaces)
                     cursors.append(sublime.Region(replace_region.begin(), replace_region.begin()))
+        elif move == "align":
+            max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
+
+            for region in regions:
+                spaces = max_right - self.view.rowcol(region.begin())[1]
+                if spaces:
+                    begin = self.view.line(region).begin()
+                    self.view.insert(edit, begin, ' ' * spaces)
+                    for i, cursor in enumerate(cursors):
+                        cursors[i] = sublime.Region(cursor.begin() + spaces, cursor.begin() + spaces)
+                    cursors.append(sublime.Region(region.begin() + spaces, region.begin() + spaces))
         else:
             max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
 

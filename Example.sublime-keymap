@@ -5,6 +5,7 @@
     { "keys": ["super+l"], "command": "simple_movement_goto_line" },
     { "keys": ["ctrl+shift+b"], "command": "simple_movement_select_block" },
     { "keys": ["super+ctrl+="], "command": "simple_movement_align_cursor" },
+    { "keys": ["super+alt+="], "command": "simple_movement_align_cursor", "args": {"move": "align"} },
     { "keys": ["super+ctrl+shift+="], "command": "simple_movement_align_cursor", "args": {"move": "left"} },
     { "keys": ["super+left"], "command": "simple_movement_bol", "args": {"extend": false} },
     { "keys": ["super+shift+left"], "command": "simple_movement_bol", "args": {"extend": true} },
