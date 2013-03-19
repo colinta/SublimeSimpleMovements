@@ -119,8 +119,8 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
 
         # sort by region.end() DESC
         def get_end(region):
-            return region.end
-        regions.sort(key=get_end)
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
 
         e = self.view.begin_edit('simple_movement')
         for region in regions:
@@ -247,8 +247,8 @@ class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
 
         # sort by region.end() DESC
         def get_end(region):
-            return region.end
-        regions.sort(key=get_end)
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
 
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
@@ -276,8 +276,8 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
 
         # sort by region.end() DESC
         def get_end(region):
-            return region.end
-        regions.sort(key=get_end)
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
 
         cursors = []
 
@@ -333,8 +333,8 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 
         # sort by region.end() DESC
         def get_end(region):
-            return region.end
-        regions.sort(key=get_end)
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
 
         for region in regions:
             self.run_each(edit, region, **kwargs)
@@ -435,8 +435,8 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
 
         # sort by region.end() DESC
         def get_end(region):
-            return region.end
-        regions.sort(key=get_end)
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
 
         if len(regions) == 1 and len(regions[0]) == 0:
             self.view.run_command('expand_selection', {'to': 'word'})
