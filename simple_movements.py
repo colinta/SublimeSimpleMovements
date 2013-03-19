@@ -118,9 +118,9 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
         regions = [region for region in self.view.sel()]
 
         # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(compare)
+        def get_end(region):
+            return region.end
+        regions.sort(key=get_end)
 
         e = self.view.begin_edit('simple_movement')
         for region in regions:
@@ -246,9 +246,9 @@ class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
         regions = [region for region in self.view.sel()]
 
         # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(compare)
+        def get_end(region):
+            return region.end
+        regions.sort(key=get_end)
 
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
@@ -275,9 +275,9 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
         regions = [region for region in self.view.sel()]
 
         # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(compare)
+        def get_end(region):
+            return region.end
+        regions.sort(key=get_end)
 
         cursors = []
 
@@ -332,9 +332,9 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
         regions = [region for region in self.view.sel()]
 
         # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(compare)
+        def get_end(region):
+            return region.end
+        regions.sort(key=get_end)
 
         for region in regions:
             self.run_each(edit, region, **kwargs)
@@ -434,9 +434,9 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
         regions = [region for region in self.view.sel()]
 
         # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(compare)
+        def get_end(region):
+            return region.end
+        regions.sort(key=get_end)
 
         if len(regions) == 1 and len(regions[0]) == 0:
             self.view.run_command('expand_selection', {'to': 'word'})
