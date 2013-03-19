@@ -41,9 +41,10 @@
     { "keys": ["ctrl+v","“"], "command": "simple_movement_insert", "args": { "insert": "“" } },
     { "keys": ["ctrl+v","‘"], "command": "simple_movement_insert", "args": { "insert": "‘" } },
     { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },
-    { "keys": ["ctrl+v","«"], "command": "simple_movement_insert", "args": { "insert": "«" } },
-    { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } },
+    { "keys": ["ctrl+v","alt+\\"], "command": "simple_movement_insert", "args": { "insert": "«" } },
     { "keys": ["ctrl+v","#"], "command": "simple_movement_insert", "args": { "insert": "#" } },
     { "keys": ["ctrl+v","="], "command": "simple_movement_insert", "args": { "insert": "=" } },
-    { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } }
+    { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },
+    // this one doesn't work:
+    { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } }
 ]
