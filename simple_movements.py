@@ -453,3 +453,24 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
                 self.view.show(found)
             else:
                 sublime.status_message('Cound not find "{0}"'.format(match))
+
+
+class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
+    def __init__(self, view):
+        view.previous_regions = []
+        super(SimpleMovementOneSelectionCommand, self).__init__(view)
+
+    def run(self, edit, index):
+        regions = [region for region in self.view.sel()]
+
+        if len(regions) == 1:
+            regions = self.view.previous_regions
+        else:
+            self.view.previous_regions = regions
+
+        try:
+            region = regions[index]
+            self.view.sel().clear()
+            self.view.sel().add(region)
+        except IndexError:
+            pass

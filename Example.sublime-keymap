@@ -46,5 +46,16 @@
     { "keys": ["ctrl+v","="], "command": "simple_movement_insert", "args": { "insert": "=" } },
     { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },
     // this one doesn't work:
-    { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } }
+    { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } },
+
+    { "keys": ["super+1"], "command": "simple_movement_one_selection", "args": { "index": 0 } },
+    { "keys": ["super+2"], "command": "simple_movement_one_selection", "args": { "index": 1 } },
+    { "keys": ["super+3"], "command": "simple_movement_one_selection", "args": { "index": 2 } },
+    { "keys": ["super+4"], "command": "simple_movement_one_selection", "args": { "index": 3 } },
+    { "keys": ["super+5"], "command": "simple_movement_one_selection", "args": { "index": 4 } },
+    { "keys": ["super+6"], "command": "simple_movement_one_selection", "args": { "index": 5 } },
+    { "keys": ["super+7"], "command": "simple_movement_one_selection", "args": { "index": 6 } },
+    { "keys": ["super+8"], "command": "simple_movement_one_selection", "args": { "index": 7 } },
+    { "keys": ["super+9"], "command": "simple_movement_one_selection", "args": { "index": 8 } },
+    { "keys": ["super+0"], "command": "simple_movement_one_selection", "args": { "index": 9 } }
 ]
