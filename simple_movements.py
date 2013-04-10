@@ -21,8 +21,7 @@ semicolon_langs = [
 
 class SimpleMovementBolCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
-        for region in regions:
+        for region in list(self.view.sel()):
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
@@ -43,8 +42,7 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementEolCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
-        for region in regions:
+        for region in list(self.view.sel()):
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
@@ -113,7 +111,7 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
         if not len(lines):
             lines = "-1"
 
-        regions = [region for region in self.view.sel()]
+        regions = list(self.view.sel())
 
         # sort by region.end() DESC
         def compare(region_a, region_b):
@@ -137,8 +135,18 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
             a = self.view.text_point(line_a, 0)
             b = self.view.text_point(line_b, 0)
             content = self.view.substr(sublime.Region(a, b))
+            self.view.run_command('simple_movement_dummy1', {'region_a': region.a, 'region_b': region.b, 'content': content})
 
-            self.view.replace(e, region, content)
+
+class SimpleMovementDummy1Command(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        region = kwargs.get('region')
+        region_a = kwargs.get('region_a')
+        region_b = kwargs.get('region_b')
+
+        region = sublime.Region(region_a, region_b)
+        content = kwargs.get('content')
+        self.view.replace(edit, region, content)
 
 
 class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
@@ -148,7 +156,7 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         self.cursor = self.view.rowcol(last_region.b)[1]
         # the row of the beginning of the line that contains the beginning of the last region
         self.first_line = self.view.rowcol(self.view.line(last_region.begin()).begin())[0]
-        self.start_regions = [region for region in self.view.sel()]
+        self.start_regions = list(self.view.sel())
         self.view.window().show_input_panel('Line(s):', '', self.goto_line, self.demo_line, self.restore)
 
     def demo_line(self, lines):
@@ -205,8 +213,7 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
 
 class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
-        for region in regions:
+        for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
@@ -237,16 +244,9 @@ class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
-
-        # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(key=cmp_to_key(compare))
-
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
-        for region in regions:
+        for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
 
@@ -264,12 +264,7 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
             sublime.status_message('Selections that span multiple lines don\'t really make sense in simple_movement_align_cursor')
             return
 
-        regions = [region for region in self.view.sel()]
-
-        # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(key=cmp_to_key(compare))
+        regions = list(self.view.sel())
 
         cursors = []
 
@@ -319,14 +314,7 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
-
-        # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(key=cmp_to_key(compare))
-
-        for region in regions:
+        for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, insert_nl=True, hard_nl=False,
@@ -419,13 +407,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, select_all=False):
-        regions = [region for region in self.view.sel()]
-
-        # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(key=cmp_to_key(compare))
-
+        regions = list(self.view.sel())
         if len(regions) == 1 and len(regions[0]) == 0:
             self.view.run_command('expand_selection', {'to': 'word'})
         else:
