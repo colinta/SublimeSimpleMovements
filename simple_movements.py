@@ -135,10 +135,10 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
             a = self.view.text_point(line_a, 0)
             b = self.view.text_point(line_b, 0)
             content = self.view.substr(sublime.Region(a, b))
-            self.view.run_command('simple_movement_dummy1', {'region_a': region.a, 'region_b': region.b, 'content': content})
+            self.view.run_command('simple_movement_duplicate_line_dummy', {'region_a': region.a, 'region_b': region.b, 'content': content})
 
 
-class SimpleMovementDummy1Command(sublime_plugin.TextCommand):
+class SimpleMovementDuplicateLineDummyCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         region = kwargs.get('region')
         region_a = kwargs.get('region_a')
@@ -407,7 +407,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, select_all=False):
-        regions = list(self.view.sel())
+        regions = list(self.view.sel())[::-1]
         if len(regions) == 1 and len(regions[0]) == 0:
             self.view.run_command('expand_selection', {'to': 'word'})
         else:
@@ -427,9 +427,8 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
         if select_all:
             found_all = self.view.find_all(match, sublime.LITERAL)
 
-            if found_all:
-                for found in found_all:
-                    self.view.sel().add(found)
+            for found in found_all:
+                self.view.sel().add(found)
         else:
             found = self.view.find(match, region.end(), sublime.LITERAL)
 
