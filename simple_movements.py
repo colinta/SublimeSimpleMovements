@@ -114,9 +114,9 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
         regions = list(self.view.sel())
 
         # sort by region.end() DESC
-        def compare(region_a, region_b):
-            return cmp(region_b.end(), region_a.end())
-        regions.sort(key=cmp_to_key(compare))
+        def get_end(region):
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
 
         for region in regions:
             self.first_line = self.view.rowcol(self.view.line(region.begin()).begin())[0]
@@ -243,6 +243,13 @@ class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
+        regions = list(self.view.sel())
+
+        # sort by region.end() DESC
+        def get_end(region):
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
+
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
         for region in self.view.sel():
@@ -264,6 +271,11 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
             return
 
         regions = list(self.view.sel())
+
+        # sort by region.end() DESC
+        def get_end(region):
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
 
         cursors = []
 
@@ -313,7 +325,14 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        for region in self.view.sel():
+        regions = list(self.view.sel())
+
+        # sort by region.end() DESC
+        def get_end(region):
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
+
+        for region in regions:
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, insert_nl=True, hard_nl=False,
@@ -406,7 +425,13 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, select_all=False):
-        regions = list(self.view.sel())[::-1]
+        regions = list(self.view.sel())
+
+        # sort by region.end() DESC
+        def get_end(region):
+            return region.end()
+        regions.sort(key=get_end, reverse=True)
+
         if len(regions) == 1 and len(regions[0]) == 0:
             self.view.run_command('expand_selection', {'to': 'word'})
         else:
@@ -436,3 +461,24 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
                 self.view.show(found)
             else:
                 sublime.status_message('Cound not find "{0}"'.format(match))
+
+
+class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
+    def __init__(self, view):
+        view.previous_regions = []
+        super(SimpleMovementOneSelectionCommand, self).__init__(view)
+
+    def run(self, edit, index):
+        regions = [region for region in self.view.sel()]
+
+        if len(regions) == 1:
+            regions = self.view.previous_regions
+        else:
+            self.view.previous_regions = regions
+
+        try:
+            region = regions[index]
+            self.view.sel().clear()
+            self.view.sel().add(region)
+        except IndexError:
+            pass
