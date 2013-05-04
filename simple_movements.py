@@ -151,7 +151,6 @@ class SimpleMovementDuplicateLineDummyCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
     def run(self, edit, **kwargs):
-        print(self.view.sel())
         last_region = self.view.sel()[-1]
         self.cursor = self.view.rowcol(last_region.b)[1]
         # the row of the beginning of the line that contains the beginning of the last region
