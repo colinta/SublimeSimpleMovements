@@ -474,3 +474,13 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
             self.view.sel().add(region)
         except IndexError:
             pass
+
+
+class SimpleMovementPageCommand(sublime_plugin.TextCommand):
+    def run(self, edit, direction):
+        position = self.view.viewport_position()
+        height = self.view.viewport_extent()[1]
+        if direction == "up":
+            height *= -1
+
+        self.view.set_viewport_position((position[0], position[1] + height), True)
