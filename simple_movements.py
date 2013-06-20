@@ -472,5 +472,6 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
             region = regions[index]
             self.view.sel().clear()
             self.view.sel().add(region)
+            self.view.show(region)
         except IndexError:
             pass
