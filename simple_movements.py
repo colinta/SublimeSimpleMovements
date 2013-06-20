@@ -21,7 +21,7 @@ semicolon_langs = [
 
 class SimpleMovementBolCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        for region in list(self.view.sel()):
+        for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
@@ -42,7 +42,7 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementEolCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        for region in list(self.view.sel()):
+        for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
@@ -243,13 +243,6 @@ class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = list(self.view.sel())
-
-        # sort by region.end() DESC
-        def get_end(region):
-            return region.end()
-        regions.sort(key=get_end, reverse=True)
-
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
         for region in self.view.sel():
