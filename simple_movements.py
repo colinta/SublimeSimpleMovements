@@ -487,3 +487,27 @@ class SimpleMovementPageCommand(sublime_plugin.TextCommand):
             height *= -1
 
         self.view.set_viewport_position((position[0], position[1] + height), True)
+
+
+class SimpleMovementRemoveDups(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # store the first position in each line
+        line_starts = []
+        for region in self.view.sel():
+            for line in self.view.split_by_newlines(region):
+                line_starts.append(self.view.line(line.begin()).begin())
+        keep = []
+        delete_regions = []
+        for point in line_starts:
+            line = self.view.full_line(point)
+            text = self.view.substr(line)
+            if text not in keep:
+                keep.append(text)
+            else:
+                delete_regions.append(line)
+        if delete_regions:
+            self.view.sel().clear()
+            for region in delete_regions:
+                self.view.sel().add(region)
+        else:
+            sublime.status_message('No duplicate lines found')
