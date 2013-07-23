@@ -21,7 +21,8 @@ semicolon_langs = [
 
 class SimpleMovementBolCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        for region in self.view.sel():
+        regions = [region for region in self.view.sel()]
+        for region in regions:
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
@@ -42,7 +43,8 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementEolCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        for region in self.view.sel():
+        regions = [region for region in self.view.sel()]
+        for region in regions:
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
