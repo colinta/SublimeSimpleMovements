@@ -16,6 +16,10 @@
         "command": "simple_movement_bol"
     },
     {
+        "caption": "Duplicate Lines",
+        "command": "simple_movement_duplicate_line"
+    },
+    {
         "caption": "Insert newline without indenting",
         "command": "simple_movement_nl"
     },
