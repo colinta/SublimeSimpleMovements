@@ -1,5 +1,7 @@
 import time
 import re
+from functools import cmp_to_key
+
 import sublime
 import sublime_plugin
 
@@ -111,7 +113,7 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
         if not len(lines):
             lines = "-1"
 
-        regions = [region for region in self.view.sel()]
+        regions = list(self.view.sel())
 
         # sort by region.end() DESC
         def get_end(region):
@@ -135,8 +137,18 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
             a = self.view.text_point(line_a, 0)
             b = self.view.text_point(line_b, 0)
             content = self.view.substr(sublime.Region(a, b))
+            self.view.run_command('simple_movement_duplicate_line_dummy', {'region_a': region.a, 'region_b': region.b, 'content': content})
 
-            self.view.replace(e, region, content)
+
+class SimpleMovementDuplicateLineDummyCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **kwargs):
+        region = kwargs.get('region')
+        region_a = kwargs.get('region_a')
+        region_b = kwargs.get('region_b')
+
+        region = sublime.Region(region_a, region_b)
+        content = kwargs.get('content')
+        self.view.replace(edit, region, content)
 
 
 class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
@@ -145,7 +157,7 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         self.cursor = self.view.rowcol(last_region.b)[1]
         # the row of the beginning of the line that contains the beginning of the last region
         self.first_line = self.view.rowcol(self.view.line(last_region.begin()).begin())[0]
-        self.start_regions = [region for region in self.view.sel()]
+        self.start_regions = list(self.view.sel())
         self.view.window().show_input_panel('Line(s):', '', self.goto_line, self.demo_line, self.restore)
 
     def demo_line(self, lines):
@@ -202,8 +214,7 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
 
 class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
-        for region in regions:
+        for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
 
     def run_each(self, edit, region, extend=False):
@@ -234,16 +245,9 @@ class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
-
-        # sort by region.end() DESC
-        def get_end(region):
-            return region.end()
-        regions.sort(key=get_end, reverse=True)
-
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
         self.view.settings().set('translate_tabs_to_spaces', False)
-        for region in regions:
+        for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
 
@@ -261,14 +265,16 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
             sublime.status_message('Selections that span multiple lines don\'t really make sense in simple_movement_align_cursor')
             return
 
-        regions = [region for region in self.view.sel()]
+        regions = self.view.sel()
+        # regions = list(self.view.sel())
 
         # sort by region.end() DESC
-        def get_end(region):
-            return region.end()
-        regions.sort(key=get_end, reverse=True)
+        # def get_end(region):
+        #     return region.end()
+        # regions.sort(key=get_end, reverse=True)
 
         cursors = []
+        first = True
 
         # find max right
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
@@ -281,10 +287,9 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
                 replace_region = sublime.Region(region.begin() - spaces, region.begin())
                 if spaces and self.view.substr(replace_region) == ' ' * spaces:
                     self.view.replace(edit, replace_region, '')
-                    # adjust previously saved cursors by `spaces`
-                    for i, cursor in enumerate(cursors):
-                        cursors[i] = sublime.Region(cursor.begin() - spaces, cursor.begin() - spaces)
+                if spaces or not first:
                     cursors.append(sublime.Region(replace_region.begin(), replace_region.begin()))
+                first = False
         elif move == "align":
             max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
 
@@ -293,9 +298,9 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
                 if spaces:
                     begin = self.view.line(region).begin()
                     self.view.insert(edit, begin, ' ' * spaces)
-                    for i, cursor in enumerate(cursors):
-                        cursors[i] = sublime.Region(cursor.begin() + spaces, cursor.begin() + spaces)
+                if spaces or not first:
                     cursors.append(sublime.Region(region.begin() + spaces, region.begin() + spaces))
+                first = False
         else:
             max_right = max(self.view.rowcol(region.begin())[1] for region in regions)
 
@@ -303,9 +308,9 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
                 spaces = max_right - self.view.rowcol(region.begin())[1]
                 if spaces:
                     self.view.insert(edit, region.begin(), ' ' * spaces)
-                    for i, cursor in enumerate(cursors):
-                        cursors[i] = sublime.Region(cursor.begin() + spaces, cursor.begin() + spaces)
+                if spaces or not first:
                     cursors.append(sublime.Region(region.begin() + spaces, region.begin() + spaces))
+                first = False
 
         if cursors:
             self.view.sel().clear()
@@ -316,7 +321,7 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
-        regions = [region for region in self.view.sel()]
+        regions = list(self.view.sel())
 
         # sort by region.end() DESC
         def get_end(region):
@@ -416,7 +421,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, select_all=False):
-        regions = [region for region in self.view.sel()]
+        regions = list(self.view.sel())
 
         # sort by region.end() DESC
         def get_end(region):
@@ -442,9 +447,8 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
         if select_all:
             found_all = self.view.find_all(match, sublime.LITERAL)
 
-            if found_all:
-                for found in found_all:
-                    self.view.sel().add(found)
+            for found in found_all:
+                self.view.sel().add(found)
         else:
             found = self.view.find(match, region.end(), sublime.LITERAL)
 
@@ -485,3 +489,27 @@ class SimpleMovementPageCommand(sublime_plugin.TextCommand):
             height *= -1
 
         self.view.set_viewport_position((position[0], position[1] + height), True)
+
+
+class SimpleMovementRemoveDups(sublime_plugin.TextCommand):
+    def run(self, edit):
+        # store the first position in each line
+        line_starts = []
+        for region in self.view.sel():
+            for line in self.view.split_by_newlines(region):
+                line_starts.append(self.view.line(line.begin()).begin())
+        keep = []
+        delete_regions = []
+        for point in line_starts:
+            line = self.view.full_line(point)
+            text = self.view.substr(line)
+            if text not in keep:
+                keep.append(text)
+            else:
+                delete_regions.append(line)
+        if delete_regions:
+            self.view.sel().clear()
+            for region in delete_regions:
+                self.view.sel().add(region)
+        else:
+            sublime.status_message('No duplicate lines found')

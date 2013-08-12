@@ -1,4 +1,6 @@
 [
+    // remove duplicate lines
+    { "keys": ["f6"], "command": "simple_movement_remove_dups" },
     // pageup/pagedown
     { "keys": ["pageup"], "command": "simple_movement_page", "args": {"direction": "up"}},
     { "keys": ["pagedown"], "command": "simple_movement_page", "args": {"direction": "down"}},
@@ -14,8 +16,8 @@
     { "keys": ["super+l"], "command": "simple_movement_goto_line" },
     { "keys": ["ctrl+shift+b"], "command": "simple_movement_select_block" },
     { "keys": ["super+ctrl+="], "command": "simple_movement_align_cursor" },
-    { "keys": ["super+alt+="], "command": "simple_movement_align_cursor", "args": {"move": "align"} },
     { "keys": ["super+ctrl+shift+="], "command": "simple_movement_align_cursor", "args": {"move": "left"} },
+    { "keys": ["super+ctrl+shift+alt+="], "command": "simple_movement_align_cursor", "args": {"move": "align"} },
     { "keys": ["super+left"], "command": "simple_movement_bol", "args": {"extend": false} },
     { "keys": ["super+shift+left"], "command": "simple_movement_bol", "args": {"extend": true} },
     { "keys": ["super+right"], "command": "simple_movement_eol", "args": {"extend": false} },
