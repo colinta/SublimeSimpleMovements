@@ -1,7 +1,17 @@
 {
-  "repo": "SublimeSimpleMovements",
   "name": "SimpleMovements",
   "description": "Adds caret moving and newline entering commands.",
   "author": "Colin T.A. Gray (colinta)",
-  "homepage": "https://github.com/colinta/SublimeSimpleMovements"
+  "details": "https://github.com/colinta/SublimeSimpleMovements",
+  "labels": ["file navigation", "text manipulation"],
+  "releases": [
+    {
+      "details": "https://github.com/colinta/SublimeSimpleMovements/tree/master",
+      "sublime_text": "<3000"
+    },
+    {
+      "details": "https://github.com/colinta/SublimeSimpleMovements/tags",
+      "sublime_text": ">=3000"
+    }
+  ]
 }
