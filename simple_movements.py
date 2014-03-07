@@ -161,6 +161,7 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         self.view.window().show_input_panel('Line(s):', '', self.goto_line, self.demo_line, self.restore)
 
     def demo_line(self, lines):
+        '''Goes to the line you've typed after a pause. Hit Esc to go back to the original location.'''
         self.started = time.time()
 
         def okay_go():
@@ -169,6 +170,10 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         sublime.set_timeout(okay_go, 300)
 
     def goto_line(self, lines):
+        '''
+        Goes to the lines. "lines" are parsed using get_line or get_two_lines,
+        from SimpleMovementParseLineCommand.
+        '''
         if not len(lines):
             self.restore()
             return
@@ -217,7 +222,7 @@ class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
         for region in self.view.sel():
             self.run_each(edit, region, **kwargs)
 
-    def run_each(self, edit, region, extend=False):
+    def run_each(self, edit, region):
         a = region.begin()
         b = region.end()
 
@@ -380,7 +385,6 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
                 nl += indent
 
         if with_comment:
-            # test
             comment_range = self.view.find(r'\/?(#+|[*]|//+|--+|[\']+)\|? *', beginning_of_line)
             if comment_range:
                 if comment_range.end() == end_of_line and unindent:

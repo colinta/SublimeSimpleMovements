@@ -22,6 +22,7 @@
     { "keys": ["super+shift+left"], "command": "simple_movement_bol", "args": {"extend": true} },
     { "keys": ["super+right"], "command": "simple_movement_eol", "args": {"extend": false} },
     { "keys": ["super+shift+right"], "command": "simple_movement_eol", "args": {"extend": true} },
+    // end a block of comments
     { "keys": ["enter"], "command": "simple_movement_nl", "args": {"with_comment": true}, "context":
         [
             { "key": "selector", "operator": "equal", "operand": "comment" }
@@ -38,6 +39,9 @@
     { "keys": ["alt+enter"], "command": "simple_movement_nl", "args": {"hard_nl": true} },
     { "keys": ["ctrl+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true} },
     { "keys": ["super+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true, "insert_nl": false} },
+    // these are built-in macros that work well.  they are probably already part of your Default Key Bindings.
+    // { "keys": ["super+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line.sublime-macro"} },
+    // { "keys": ["super+shift+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line Before.sublime-macro"} },
 
     //|  insert literal characters
     { "keys": ["ctrl+v","enter"], "command": "simple_movement_insert", "args": { "insert": "\n" } },
