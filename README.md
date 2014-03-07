@@ -64,6 +64,7 @@ goto_line and duplicate_line both support cool line selection tricks:
 The duplicate line command supports all these, but duplicates those lines at the *current* cursor location rather than moving the cursor.
 
 `simple_movement_nl`: Inserts a newline, or moves caret to end of line.  Can also insert line-ending characters and unindent. Quite a few options:
+
 1. `hard_nl true|false`: inserts a newline, and keeps the cursor at the first position; doesn't try to match whitespace
 2. `with_terminator true|false`: in languages that use a `;` as the line terminator, this option inserts the terminator at the end of the current line.
 3. `insert_nl true|false`: if false, it *doesn't* insert a newline! weird, but makes sense when you combine it with `with_terminator`. Inserts a semicolon if there isn't one there, then goes to the end of the line.
