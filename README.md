@@ -94,3 +94,11 @@ Honestly, this command does a ton of stuff.  Check out the example key bindings 
 At one point, some version of Sublime Text changed how "Quick Find Next" (`super+d`) worked.  This command makes `super+d` the same simple powerhouse it's meant to be.
 - works intuitively (for me!) with multiple cursors
 - has a `select_all` option to select *all* instances of the current selections.
+
+##### `simple_movement_one_selection`
+
+This command is used to select or UNselect one of your cursors. I work with
+multiple cursors A LOT, and I love this command. I have it bound to
+`super+1..0`, but super+0 selects the *last* cursor, which is often very handy.
+`super+shift+1..0` unselects a cursor, usually I just need to use
+`super+shift+1` or `super+shift+0` to unselect the first or last cursor.

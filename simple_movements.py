@@ -468,7 +468,7 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
         view.previous_regions = []
         super(SimpleMovementOneSelectionCommand, self).__init__(view)
 
-    def run(self, edit, index):
+    def run(self, edit, index, select=True):
         regions = [region for region in self.view.sel()]
 
         if len(regions) == 1:
@@ -477,10 +477,14 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
             self.view.previous_regions = regions
 
         try:
-            region = regions[index]
+            if select:
+                regions = [regions[index]]
+            else:
+                regions.pop(index)
             self.view.sel().clear()
-            self.view.sel().add(region)
-            self.view.show(region)
+            self.view.sel().add_all(regions)
+            if select:
+                self.view.show(regions[0])
         except IndexError:
             pass
 
