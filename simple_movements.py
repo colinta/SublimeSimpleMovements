@@ -78,7 +78,8 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
         else:
             return int(line) - 1
 
-    def get_two_lines(self, text, c):
+    def get_two_lines(self, text):
+        c = ','
         # supported multiline syntax:
         # a,b  =>  lines a to b
         # a,  => just line a
@@ -125,7 +126,7 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
 
             try:
                 if ',' in lines:
-                    line_a, line_b = self.get_two_lines(lines, ',')
+                    line_a, line_b = self.get_two_lines(lines)
                 else:
                     line_a = self.get_line(lines)
                     line_b = line_a + 1
@@ -180,7 +181,7 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
 
         try:
             if ',' in lines:
-                line_a, line_b = self.get_two_lines(lines, ',')
+                line_a, line_b = self.get_two_lines(lines)
             else:
                 line_a = line_b = self.get_line(lines)
         except ValueError:
