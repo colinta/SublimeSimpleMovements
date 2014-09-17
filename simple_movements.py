@@ -122,6 +122,70 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
 
         return line_a, line_b
 
+    def demo_line(self, lines):
+        '''Goes to the line you've typed after a pause. Hit Esc to go back to the original location.'''
+        self.started = time.time()
+
+        def okay_go():
+            if time.time() - self.started > .270:
+                self.goto_line(lines)
+        sublime.set_timeout(okay_go, 300)
+
+    def goto_line(self, lines):
+        '''
+        Goes to the lines. "lines" are parsed using get_line or get_two_lines,
+        from SimpleMovementParseLineCommand.
+        '''
+        if not len(lines):
+            self.restore()
+            return
+
+        try:
+            if ',' in lines:
+                line_a, line_b = self.get_two_lines(lines)
+            else:
+                line_a = line_b = self.get_line(lines)
+        except ValueError:
+            self.restore()
+            return
+
+        if line_b == line_a:
+            # try to go to the same column.  the "too_far" check makes sure we
+            # don't go to the next line by accident
+            start = self.view.text_point(line_a, self.cursor)
+            too_far = self.view.text_point(line_a + 1, 0)
+            if start >= too_far:
+                start = too_far - 1
+            end = start
+        else:
+            start = self.view.text_point(line_a, 0)
+            end = self.view.text_point(line_b, 0)
+
+        # check for additional modifiers at the end of the input
+        move_over = re.search(r'[.]+$', lines)
+        if move_over:
+            start = self.view.text_point(line_a, 0)
+            end = start + len(move_over.group(0))
+
+        if start < 0 or end < 0 or start > self.view.size() or end > self.view.size():
+            sublime.status_message('Invalid entry')
+            self.restore()
+            return
+
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(start, end))
+        pos = self.view.viewport_position()
+        self.view.show_at_center(sublime.Region(start, end))
+        new_pos = self.view.viewport_position()
+        if abs(new_pos[0] - pos[0]) <= 1.0 and abs(new_pos[1] - pos[1]) <= 1.0:
+            self.view.set_viewport_position((new_pos[0], new_pos[1] + 1))
+            self.view.set_viewport_position((new_pos[0], new_pos[1]))
+
+    def restore(self):
+        self.view.sel().clear()
+        for region in self.start_regions:
+            self.view.sel().add(region)
+
 
 class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
     def run(self, edit, **kwargs):
@@ -129,9 +193,11 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
         self.cursor = self.view.rowcol(last_region.b)[1]
         # the row of the beginning of the line that contains the beginning of the last region
         self.first_line = self.view.rowcol(self.view.line(last_region.begin()).begin())[0]
-        self.view.window().show_input_panel('Line(s):', '', self.duplicate_line, None, None)
+        self.start_regions = list(self.view.sel())
+        self.view.window().show_input_panel('Line(s):', '', self.duplicate_line, self.demo_line, None)
 
     def duplicate_line(self, lines):
+        self.restore()
         if not len(lines):
             lines = "-1"
 
@@ -181,62 +247,6 @@ class SimpleMovementGotoLineCommand(SimpleMovementParseLineCommand):
         self.first_line = self.view.rowcol(self.view.line(last_region.begin()).begin())[0]
         self.start_regions = list(self.view.sel())
         self.view.window().show_input_panel('Line(s):', '', self.goto_line, self.demo_line, self.restore)
-
-    def demo_line(self, lines):
-        '''Goes to the line you've typed after a pause. Hit Esc to go back to the original location.'''
-        self.started = time.time()
-
-        def okay_go():
-            if time.time() - self.started > .270:
-                self.goto_line(lines)
-        sublime.set_timeout(okay_go, 300)
-
-    def goto_line(self, lines):
-        '''
-        Goes to the lines. "lines" are parsed using get_line or get_two_lines,
-        from SimpleMovementParseLineCommand.
-        '''
-        if not len(lines):
-            self.restore()
-            return
-
-        try:
-            if ',' in lines:
-                line_a, line_b = self.get_two_lines(lines)
-            else:
-                line_a = line_b = self.get_line(lines)
-        except ValueError:
-            self.restore()
-            return
-
-        if line_b == line_a:
-            start = self.view.text_point(line_a, self.cursor)
-            too_far = self.view.text_point(line_a + 1, 0)
-            if start >= too_far:
-                start = too_far - 1
-            end = start
-        else:
-            start = self.view.text_point(line_a, 0)
-            end = self.view.text_point(line_b, 0)
-
-        if start < 0 or end < 0 or start > self.view.size() or end > self.view.size():
-            sublime.status_message('Invalid entry')
-            self.restore()
-            return
-
-        self.view.sel().clear()
-        self.view.sel().add(sublime.Region(start, end))
-        pos = self.view.viewport_position()
-        self.view.show_at_center(sublime.Region(start, end))
-        new_pos = self.view.viewport_position()
-        if abs(new_pos[0] - pos[0]) <= 1.0 and abs(new_pos[1] - pos[1]) <= 1.0:
-            self.view.set_viewport_position((new_pos[0], new_pos[1] + 1))
-            self.view.set_viewport_position((new_pos[0], new_pos[1]))
-
-    def restore(self):
-        self.view.sel().clear()
-        for region in self.start_regions:
-            self.view.sel().add(region)
 
 
 class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
