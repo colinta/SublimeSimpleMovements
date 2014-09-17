@@ -296,6 +296,22 @@ class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
         self.view.show(region)
 
 
+class SimpleMovementSnippetPickerCommand(sublime_plugin.TextCommand):
+    def run(self, edit, choices):
+        prompts = []
+        snippets = []
+        for prompt, insert in choices:
+            prompts.append(prompt)
+            snippets.append(insert)
+        self.view.window().show_quick_panel(prompts, self.handler(snippets))
+
+    def handler(self, snippets):
+        def _handler(index):
+            if index != -1:
+                self.view.run_command('insert_snippet', {'contents': snippets[index]})
+        return _handler
+
+
 class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
     def run(self, edit, move="right"):
         if any(region for region in self.view.sel() if self.view.rowcol(region.a)[0] != self.view.rowcol(region.b)[0]):

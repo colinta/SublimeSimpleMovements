@@ -24,6 +24,26 @@
         "command": "simple_movement_nl"
     },
     {
+        "caption": "Insert from a list",
+        "command": "simple_movement_snippet_picker",
+        "args": { "choices": [
+            ["⌘ Command", "⌘"],
+            ["⇧ Shift", "⇧"],
+            ["⌃ Ctrl", "⌃"],
+            ["⌥ Alt", "⌥"],
+            ["⎋ Power", "⎋"],
+            ["× Times", "×"],
+            ["← Left", "←"],
+            ["→ Right", "→"],
+            ["↑ Up", "↑"],
+            ["↓ Down", "↓"],
+            ["★ Star", "★"],
+            ["✓ Check", "✓"],
+            ["⌫ Delete", "⌫"],
+            ["† †his thing", "†"]
+        ]}
+    },
+    {
         "caption": "Insert a literal tab",
         "command": "simple_movement_insert",
         "args": { "insert": "\t" }
