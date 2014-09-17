@@ -393,6 +393,16 @@ class SimpleMovementMoveViewportCommand(sublime_plugin.TextCommand):
             self.view.set_viewport_position(new_position)
 
 
+class SimpleMovementPageCommand(sublime_plugin.TextCommand):
+    def run(self, edit, direction):
+        position = self.view.viewport_position()
+        height = self.view.viewport_extent()[1]
+        if direction == "up":
+            height *= -1
+
+        self.view.set_viewport_position((position[0], position[1] + height), True)
+
+
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         regions = list(self.view.sel())
@@ -492,7 +502,6 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 
 
 class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
-
     def run(self, edit, select_all=False):
         regions = list(self.view.sel())
 
@@ -556,16 +565,6 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
                 self.view.show(regions[0])
         except IndexError:
             pass
-
-
-class SimpleMovementPageCommand(sublime_plugin.TextCommand):
-    def run(self, edit, direction):
-        position = self.view.viewport_position()
-        height = self.view.viewport_extent()[1]
-        if direction == "up":
-            height *= -1
-
-        self.view.set_viewport_position((position[0], position[1] + height), True)
 
 
 class SimpleMovementRemoveDups(sublime_plugin.TextCommand):
