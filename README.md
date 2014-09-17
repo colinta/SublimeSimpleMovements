@@ -1,7 +1,80 @@
 SimpleMovement plugin
 =====================
 
-Adds caret moving and newline entering commands.  `super+left` / `home` go to the *real* beginning of line, and some nifty `enter` commands.
+This plugin started very humbly, and is now my dumping ground for all movement,
+selection, and very simple insertion commands.
+
+If you use it to the fullest, you'll have what **I** consider to be better
+newline, selection, and movement commands.  Each command is mostly documented at
+the bottom.  Here's an overview of what is in here:
+
+###### Newline
+
+- Pressing enter while writing comments *continues* writing comments
+- Pressing `super+alt+enter` inserts a `;` in languages that need it, in places
+  where they are needed.  In Python, it inserts a `:` at the end of lines that
+  start with`def/for/while/etc`
+- `alt+enter` inserts a "\n" and begins at the beginning of the line
+- `super+shift+enter` inserts a line *above* the current line
+
+###### Beginning/End of Line
+Pressing `super+left` goes to the very beginning, unless you're already there,
+then it goes to the first non-whitespace character.
+
+`super+right` does the same, but for the end of line
+
+###### Goto line
+`super+l` has super powers.  You can select a range (`12,20`) a single line
+(`40,`), or use relative locations (`-1,+1`)
+
+###### Duplicate line
+`ctrl+d` uses the same line parsing as goto-line, but inserts the lines you
+choose at the current cursor(s) location(s).
+
+###### Selecting "block" of text
+Use the keyboard to select a bunch of text, then `ctrl+shift+b` to turn it into
+separate selections.  Useful for doing ASCII art, among other things.
+
+###### Inserting text
+Sometimes you just need a way to insert some text. I bind `ctrl+v,(` to insert a
+literal '(', otherwise typing '(' auto-inserts (thanks to SublimeBracketeer) a
+pair of parentheses. `simple_movement_insert`
+
+Also handy is a command that brings up a palette to *select* some text to
+insert. The `simple_movement_snippet_picker` command is additionally useful
+because it actually inserts using the `insert_snippet` command, so you can bind
+a collection of related snippets to a keypress and choose them using
+quick-search.  I use it to make it easy to find ⌘⇧⌃⌥.
+
+###### Aligning the cursor
+Actually, wbond has a much better plugin, but this one works using multiple
+cursors.
+
+###### Moving the viewport
+I used this ability in TextMate a lot, and wanted it here.  It's basically using
+the keyboard to scroll, by a little or a lot.
+
+###### Select next
+I don't like the way "Incremental Find" works in sublime text.  I prefer the
+quick-and-immediate search that TextMate provided via `ctrl+s`.  To that, I
+added regex search, search+extend-selection (with support for multiple cursors)
+and reverse search.  You should master these, they are **REALLY REALLY** useful!
+
+###### Multiple cursors => less cursors
+I really love the multiple cursors feature of Sublime Text.  The
+`simple_movement_one_selection` command can either remove one cursor, or select
+one of the cursors.  For instance, I might select five things, then iterate
+through then using `super+1..5`.  Or select all of them in the document, and go
+to the first or last.  Or unselect the first and last.  Again, really useful,
+but you'll need to learn them.
+
+###### Select duplicates
+This is a weird one, honestly I don't remember when I use it, but it's bound to
+`F6` and I guess I use it often enough... anyway it's based on multiple
+selections.  Select a bunch of things that might be similar, then activate this
+command.  It will unselect the *first* of each unique item.  wat?  yeah, well,
+I said it's a weird one.
+
 
 Installation
 ------------
@@ -102,5 +175,6 @@ At one point, some version of Sublime Text changed how "Quick Find Next" (`super
 This command is used to select or UNselect one of your cursors. I work with
 multiple cursors A LOT, and I love this command. I have it bound to
 `super+1..0`, but super+0 selects the *last* cursor, which is often very handy.
+
 `super+shift+1..0` unselects a cursor, usually I just need to use
 `super+shift+1` or `super+shift+0` to unselect the first or last cursor.
