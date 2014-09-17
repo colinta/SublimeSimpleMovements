@@ -69,14 +69,30 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
     Base class for SimpleMovementDuplicateLineCommand and SimpleMovementGotoLineCommand
     """
     def get_line(self, line):
+        pre = 0
+        times = 1
+        start = 0
         if line[0] == '+':
-            return self.first_line + int(line[1:])
+            pre = self.first_line
+            start = 1
         elif line[0] == '-':
-            return self.first_line - int(line[1:])
+            pre = self.first_line
+            start = 1
+            times = -1
         elif line == '0':
-            return self.first_line
+            pre = self.first_line
         else:
-            return int(line) - 1
+            pre = -1
+
+        stop = start
+        while stop < len(line):
+            stop += 1
+            try:
+                int(line[start:stop])
+            except ValueError:
+                stop -= 1
+                break
+        return pre + times * int(line[start:stop])
 
     def get_two_lines(self, text):
         c = ','
