@@ -95,25 +95,30 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
         return pre + times * int(line[start:stop])
 
     def get_two_lines(self, text):
-        c = ','
         # supported multiline syntax:
         # a,b  =>  lines a to b
         # a,  => just line a
         # ,b  => current line to line b
         # ,  => just current line
-        line_a, line_b = text.split(c)
-        if not line_a:
-            # ,b
-            line_a = self.first_line
-        else:
+        match = re.match(r'^([^,]*)(,+)([^,]*)$', text)
+
+        if not match:
+            return self.get_line(text), None, 0
+
+        line_a, commas, line_b = match.group(1), match.group(2), match.group(3)
+
+        if line_a:
             line_a = self.get_line(line_a)
+        else:
+            # ',b'
+            line_a = self.first_line
 
         if line_b:
             line_b = self.get_line(line_b)
+            line_b += 1
         else:
-            line_b = line_a
-
-        line_b += 1
+            # 'a,' or just ','
+            line_b = line_a + len(commas)
 
         return line_a, line_b
 

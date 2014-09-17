@@ -72,8 +72,10 @@ goto_line and duplicate_line both support cool line selection tricks:
 
 * `123`: Goes to line 123
 * `123,`: Goes to line 123 and selects it
+* `123,,,,`: Goes to line 123 and selects it and the next 3 lines
 * `123,125`: Selects lines 123-125
 * `-1,+1`: Selects one line up, the current line, and one line below
+* `,,,`: Select the current line and next 2 lines
 
 The duplicate line command supports all these, but duplicates those lines at the *current* cursor location rather than moving the cursor.
 
