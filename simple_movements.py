@@ -346,6 +346,27 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
         self.view.settings().set('translate_tabs_to_spaces', restore_translate_tabs_to_spaces)
 
 
+class SimpleMovementMoveViewportCommand(sublime_plugin.TextCommand):
+    def run(self, edit, direction, factor=1):
+        position = self.view.viewport_position()
+        delta = self.view.line_height() * factor
+
+        if direction == 'up':
+            new_position = position[0], position[1] - delta
+        elif direction == 'down':
+            new_position = position[0], position[1] + delta
+        elif direction == 'center':
+            regions = self.view.sel()
+            if regions:
+                self.view.show_at_center(regions[0])
+                new_position = None
+            else:
+                new_position = position
+
+        if new_position:
+            self.view.set_viewport_position(new_position)
+
+
 class SimpleMovementNlCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         regions = list(self.view.sel())

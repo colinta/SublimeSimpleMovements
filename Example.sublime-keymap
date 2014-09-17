@@ -22,6 +22,15 @@
     { "keys": ["super+shift+left"], "command": "simple_movement_bol", "args": {"extend": true} },
     { "keys": ["super+right"], "command": "simple_movement_eol", "args": {"extend": false} },
     { "keys": ["super+shift+right"], "command": "simple_movement_eol", "args": {"extend": true} },
+
+    // controlling the viewport
+    { "keys": ["super+alt+h"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "h", "ipp", "inl", "m", "mm"]} },
+    { "keys": ["super+alt+up"], "command": "simple_movement_move_viewport", "args": {"direction": "up"} },
+    { "keys": ["super+alt+down"], "command": "simple_movement_move_viewport", "args": {"direction": "down"} },
+    { "keys": ["super+alt+space"], "command": "simple_movement_move_viewport", "args": {"direction": "center"} },
+    { "keys": ["super+alt+shift+up"], "command": "simple_movement_move_viewport", "args": {"direction": "up", "factor": 5} },
+    { "keys": ["super+alt+shift+down"], "command": "simple_movement_move_viewport", "args": {"direction": "down", "factor": 5} },
+
     // end a block of comments
     { "keys": ["enter"], "command": "simple_movement_nl", "args": {"with_comment": true}, "context":
         [
@@ -63,6 +72,7 @@
     { "keys": ["ctrl+v","#"], "command": "simple_movement_insert", "args": { "insert": "#" } },
     { "keys": ["ctrl+v","="], "command": "simple_movement_insert", "args": { "insert": "=" } },
     { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },
+    { "keys": ["ctrl+v","|"], "command": "simple_movement_insert", "args": { "insert": "|" } },
     // this one doesn't work:
     { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } },
 
