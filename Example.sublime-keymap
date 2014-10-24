@@ -59,6 +59,7 @@
     { "keys": ["ctrl+v","*"], "command": "simple_movement_insert", "args": { "insert": "*" } },
     { "keys": ["ctrl+v","\""], "command": "simple_movement_insert", "args": { "insert": "\"" } },
     { "keys": ["ctrl+v","`"], "command": "simple_movement_insert", "args": { "insert": "`" } },
+    { "keys": ["ctrl+9"], "command": "simple_movement_insert", "args": { "insert": "(" } },
     { "keys": ["ctrl+v","("], "command": "simple_movement_insert", "args": { "insert": "(" } },
     { "keys": ["ctrl+v",")"], "command": "simple_movement_insert", "args": { "insert": ")" } },
     { "keys": ["ctrl+v","["], "command": "simple_movement_insert", "args": { "insert": "[" } },
