@@ -24,6 +24,16 @@
         "command": "simple_movement_nl"
     },
     {
+        "caption": "Keep all even cursors",
+        "command": "simple_movement_one_selection",
+        "args": { "index": "evens" }
+    },
+    {
+        "caption": "Keep all odd cursors",
+        "command": "simple_movement_one_selection",
+        "args": { "index": "odds" }
+    },
+    {
         "caption": "Insert from a list",
         "command": "simple_movement_snippet_picker",
         "args": { "choices": [

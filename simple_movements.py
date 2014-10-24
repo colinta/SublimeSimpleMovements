@@ -554,17 +554,34 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
         else:
             self.view.previous_regions = regions
 
-        try:
-            if select:
-                regions = [regions[index]]
-            else:
-                regions.pop(index)
-            self.view.sel().clear()
-            self.view.sel().add_all(regions)
-            if select:
-                self.view.show(regions[0])
-        except IndexError:
-            pass
+        if index == 'evens':
+            keep = False
+            for region in regions:
+                if not keep:
+                    self.view.sel().subtract(region)
+                keep = not keep
+        elif index == 'odds':
+            keep = True
+            for region in regions:
+                if not keep:
+                    self.view.sel().subtract(region)
+                keep = not keep
+        else:
+            try:
+                if select:
+                    regions = [regions[index]]
+                else:
+                    regions.pop(index)
+
+                self.view.sel().clear()
+                self.view.sel().add_all(regions)
+
+                if select or index == 1:
+                    self.view.show(regions[0])
+                elif index == -1:
+                    self.view.show(regions[-1])
+            except IndexError:
+                pass
 
 
 class SimpleMovementRemoveDups(sublime_plugin.TextCommand):
