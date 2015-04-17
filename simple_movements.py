@@ -98,9 +98,11 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
         # supported multiline syntax:
         # a,b  =>  lines a to b
         # a,  => just line a
+        # a,,,  => line a and next 2 lines (3 lines total)
         # ,b  => current line to line b
         # ,  => just current line
-        match = re.match(r'^([^,]*)(,+)([^,]*)$', text)
+        # ,,  => current and next line
+        match = re.match(r'^([^,]*)(,+)(.*)$', text)
 
         if not match:
             return self.get_line(text), None, 0
@@ -204,9 +206,7 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
         regions = list(self.view.sel())
 
         # sort by region.end() DESC
-        def get_end(region):
-            return region.end()
-        regions.sort(key=get_end, reverse=True)
+        regions.sort(key=lambda region: region.end(), reverse=True)
 
         for region in regions:
             self.first_line = self.view.rowcol(self.view.line(region.begin()).begin())[0]
@@ -319,12 +319,6 @@ class SimpleMovementAlignCursorCommand(sublime_plugin.TextCommand):
             return
 
         regions = self.view.sel()
-        # regions = list(self.view.sel())
-
-        # sort by region.end() DESC
-        # def get_end(region):
-        #     return region.end()
-        # regions.sort(key=get_end, reverse=True)
 
         cursors = []
         first = True
@@ -576,7 +570,7 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
                 self.view.sel().clear()
                 self.view.sel().add_all(regions)
 
-                if select or index == 1:
+                if select or index == 0:
                     self.view.show(regions[0])
                 elif index == -1:
                     self.view.show(regions[-1])
