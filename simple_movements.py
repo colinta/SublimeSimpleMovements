@@ -9,6 +9,7 @@ import sublime_plugin
 semicolon_langs = [
     'source.php',
     'source.js',
+    'source.arduino',
     'source.c',
     'source.c++',
     'source.java',
