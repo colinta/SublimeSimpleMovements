@@ -496,7 +496,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 
 
 class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
-    def run(self, edit, select_all=False):
+    def run(self, edit, select_all=False, remove_last=False):
         regions = list(self.view.sel())
 
         # sort by region.end() DESC
@@ -514,6 +514,8 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
                 self.select_next(region, match, previous_region, previous_match, select_all=select_all)
                 previous_region = region
                 previous_match = match
+            if remove_last:
+                self.view.sel().subtract(regions[0])
             self.select_next(region, match, previous_region, previous_match, select_all=select_all)
 
     def select_next(self, region, match, previous_region, previous_match, select_all):

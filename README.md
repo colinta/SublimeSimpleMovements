@@ -5,8 +5,7 @@ This plugin started very humbly, and is now my dumping ground for all movement,
 selection, and very simple insertion commands.
 
 If you use it to the fullest, you'll have what **I** consider to be better
-newline, selection, and movement commands.  Each command is mostly documented at
-the bottom.  Here's an overview of what is in here:
+newline, selection, and movement commands.
 
 ###### Newline
 
@@ -21,24 +20,39 @@ the bottom.  Here's an overview of what is in here:
 Pressing `super+left` goes to the very beginning, unless you're already there,
 then it goes to the first non-whitespace character.
 
-`super+right` does the same, but for the end of line
+`super+right` does the same, but for the end of line.
 
 ###### Goto line
 `super+l` has super powers.  You can select a range (`12,20`) a single line
 (`40,`), or use relative locations (`-1,+1`)
 
 ###### Duplicate line
-`ctrl+d` uses the same line parsing as goto-line, but inserts the lines you
-choose at the current cursor(s) location(s).
+`super+shift+d` uses the same line parsing as goto-line, but inserts the lines you
+choose at the current cursor location(s).
 
-###### Selecting "block" of text
-Use the keyboard to select a bunch of text, then `ctrl+shift+b` to turn it into
-separate selections.  Useful for doing ASCII art, among other things.
+###### Selection/cursor manipulation
+- Selecting "blocks": Use the keyboard to select a bunch of text, then `ctrl+shift+b` to turn it into
+  separate selections.  Useful for doing ASCII art, among other things.
+- Select next: this is my version of the built-in and handy `super+d`.  My
+  version does not "wrap" to the beginning, and there's a bug when selecting
+  whitespace that my version doesn't have.
+- Quick find: I don't like the way "Incremental Find" works in sublime text.  I
+  prefer the quick-and-immediate search that TextMate provided via `ctrl+s`.
+  Then I added regex search, search+extend-selection (with support for multiple
+  cursors) and reverse search.  You should master these, they are **REALLY
+  REALLY** useful!
+- Multiple cursors => less cursors: I really love the multiple cursors feature
+  of Sublime Text.  The `simple_movement_one_selection` command can either
+  remove one cursor, or select one of the cursors.  For instance, I might select
+  five things, then iterate through then using `super+1..5`.  Or select all of
+  them in the document, and go to the first or last.  Or unselect the first and
+  last, or select the odd or even selections.  Again, really useful, but you'll
+  need to learn them.
 
 ###### Inserting text
 Sometimes you just need a way to insert some text. I bind `ctrl+v,(` to insert a
 literal '(', otherwise typing '(' auto-inserts (thanks to SublimeBracketeer) a
-pair of parentheses. `simple_movement_insert`
+pair of parentheses.
 
 Also handy is a command that brings up a palette to *select* some text to
 insert. The `simple_movement_snippet_picker` command is additionally useful
@@ -54,49 +68,16 @@ cursors.
 I used this ability in TextMate a lot, and wanted it here.  It's basically using
 the keyboard to scroll, by a little or a lot.
 
-###### Select next
-I don't like the way "Incremental Find" works in sublime text.  I prefer the
-quick-and-immediate search that TextMate provided via `ctrl+s`.  To that, I
-added regex search, search+extend-selection (with support for multiple cursors)
-and reverse search.  You should master these, they are **REALLY REALLY** useful!
-
-###### Multiple cursors => less cursors
-I really love the multiple cursors feature of Sublime Text.  The
-`simple_movement_one_selection` command can either remove one cursor, or select
-one of the cursors.  For instance, I might select five things, then iterate
-through then using `super+1..5`.  Or select all of them in the document, and go
-to the first or last.  Or unselect the first and last.  Again, really useful,
-but you'll need to learn them.
-
 ###### Select duplicates
-This is a weird one, honestly I don't remember when I use it, but it's bound to
-`F6` and I guess I use it often enough... anyway it's based on multiple
-selections.  Select a bunch of things that might be similar, then activate this
-command.  It will unselect the *first* of each unique item.  wat?  yeah, well,
-I said it's a weird one.
+Select a bunch of things that might be similar, then activate this command.  It
+will unselect the *first* of each unique item, leaving it up to you what to do
+with the duplicates.
 
 
 Installation
 ------------
 
 1. Using Package Control, install "SimpleMovement"
-
-Or:
-
-1. Open the Sublime Text Packages folder
-    - OS X: ~/Library/Application Support/Sublime Text 3/Packages/
-    - Windows: %APPDATA%/Sublime Text 3/Packages/
-    - Linux: ~/.Sublime Text 3/Packages/ or ~/.config/sublime-text-3/Packages
-
-2. clone this repo
-3. Install keymaps for the commands (see Example.sublime-keymap for my preferred keys)
-
-### Sublime Text 2
-
-1. Open the Sublime Text 2 Packages folder
-2. clone this repo, but use the `st2` branch
-
-       git clone -b st2 git@github.com:colinta/SublimeSimpleMovements
 
 Commands
 --------
@@ -122,7 +103,9 @@ Inserts a character.  Used to insert literal quotes, tabs, anything.
 ##### `simple_movement_select_block`
 
 Changes a multi-line selection into multiple block selections.  Each block will begin and end at the same column, as determined by the start and end points of the original region.
-- So you select a block of text, activate this plugin, and now you'll have each line selected.  I often use this to select and entire file, then this command gives me a cursor on every line.  Like if I'm editing a log file for instance.
+
+Select a block of text, activate this plugin, and now you'll have each line selected.  I often use this to select an entire file, then this command gives me a cursor on every line.  Like if I'm editing a log file for instance.
+
 
 ##### `simple_movement_align_cursor`
 
