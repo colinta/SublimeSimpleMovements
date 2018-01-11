@@ -33,6 +33,8 @@ choose at the current cursor location(s).
 ###### Selection/cursor manipulation
 - Selecting "blocks": Use the keyboard to select a bunch of text, then `ctrl+shift+b` to turn it into
   separate selections.  Useful for doing ASCII art, among other things.
+- Selecting characters: Turn selection(s) into 1-character selections; useful
+  for selecting whitespace and converting into periods or dashes.
 - Select next: this is my version of the built-in and handy `super+d`.  My
   version does not "wrap" to the beginning, and there's a bug when selecting
   whitespace that my version doesn't have.
@@ -106,6 +108,14 @@ Changes a multi-line selection into multiple block selections.  Each block will 
 
 Select a block of text, activate this plugin, and now you'll have each line selected.  I often use this to select an entire file, then this command gives me a cursor on every line.  Like if I'm editing a log file for instance.
 
+##### `simple_movement_select_chars`
+
+Change selections into multiple one-character selections.  I use this to convert
+a bunch of whitespace to periods, or change dashes to underscores.
+
+Select some dashes or whitespace (or anything), activate
+`simple_movement_select_chars`, and hit `_` or `.`.  Every character will be
+replaced.
 
 ##### `simple_movement_align_cursor`
 

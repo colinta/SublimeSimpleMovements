@@ -280,6 +280,21 @@ class SimpleMovementSelectBlockCommand(sublime_plugin.TextCommand):
             self.view.sel().add(sublime.Region(start, end))
 
 
+class SimpleMovementSelectCharsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        for region in self.view.sel():
+            self.run_each(edit, region)
+
+    def run_each(self, edit, region):
+        if len(region) == 0:
+            return
+
+        self.view.sel().subtract(region)
+        for c in range(region.begin(), region.end()):
+            r = sublime.Region(c, c+1)
+            self.view.sel().add(r)
+
+
 class SimpleMovementInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         restore_translate_tabs_to_spaces = self.view.settings().get('translate_tabs_to_spaces')
