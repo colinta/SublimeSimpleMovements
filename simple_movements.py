@@ -1,6 +1,5 @@
 import time
 import re
-from functools import cmp_to_key
 
 import sublime
 import sublime_plugin
@@ -9,6 +8,9 @@ import sublime_plugin
 semicolon_langs = [
     'source.php',
     'source.js',
+    'source.jsx',
+    'source.ts',
+    'source.tsx',
     'source.arduino',
     'source.c',
     'source.c++',
@@ -17,7 +19,7 @@ semicolon_langs = [
     'source.objc++',
     'source.shell',
     'source.css',
-    ]
+]
 
 
 class SimpleMovementBolCommand(sublime_plugin.TextCommand):
@@ -179,10 +181,6 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
         self.view.sel().add(sublime.Region(start, end))
         pos = self.view.viewport_position()
         self.view.show_at_center(sublime.Region(start, end))
-        new_pos = self.view.viewport_position()
-        if abs(new_pos[0] - pos[0]) <= 1.0 and abs(new_pos[1] - pos[1]) <= 1.0:
-            self.view.set_viewport_position((new_pos[0], new_pos[1] + 1))
-            self.view.set_viewport_position((new_pos[0], new_pos[1]))
 
     def restore(self):
         self.view.sel().clear()
@@ -208,7 +206,6 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
 
         # sort by region.end() DESC
         regions.sort(key=lambda region: region.end(), reverse=True)
-
         for region in regions:
             self.first_line = self.view.rowcol(self.view.line(region.begin()).begin())[0]
 
@@ -512,7 +509,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
 
 
 class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
-    def run(self, edit, select_all=False, remove_last=False):
+    def run(self, edit, select_all=False, remove_last=False, ignore_case=False):
         regions = list(self.view.sel())
 
         # sort by region.end() DESC
@@ -527,24 +524,24 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
             previous_match = None
             for region in regions:
                 match = self.view.substr(region)
-                self.select_next(region, match, previous_region, previous_match, select_all=select_all)
+                self.select_next(region, match, previous_region, previous_match, select_all=select_all, ignore_case=ignore_case)
                 previous_region = region
                 previous_match = match
             if remove_last:
                 self.view.sel().subtract(regions[0])
-            self.select_next(region, match, previous_region, previous_match, select_all=select_all)
+            self.select_next(region, match, previous_region, previous_match, select_all=select_all, ignore_case=ignore_case)
 
-    def select_next(self, region, match, previous_region, previous_match, select_all):
+    def select_next(self, region, match, previous_region, previous_match, select_all, ignore_case):
         if match == previous_match:
             return
 
         if select_all:
-            found_all = self.view.find_all(match, sublime.LITERAL)
+            found_all = self.view.find_all(match, sublime.LITERAL | (ignore_case and sublime.IGNORECASE or 0))
 
             for found in found_all:
                 self.view.sel().add(found)
         else:
-            found = self.view.find(match, region.end(), sublime.LITERAL)
+            found = self.view.find(match, region.end(), sublime.LITERAL | (ignore_case and sublime.IGNORECASE or 0))
 
             if found:
                 self.view.sel().add(found)
@@ -598,23 +595,75 @@ class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
 
 class SimpleMovementRemoveDups(sublime_plugin.TextCommand):
     def run(self, edit):
+        if len(self.view.sel()) == 1:
+            return self.run_one_sel()
+        else:
+            return self.run_for_regions(self.view.sel())
+
+    def run_one_sel(self):
         # store the first position in each line
-        line_starts = []
-        for region in self.view.sel():
-            for line in self.view.split_by_newlines(region):
-                line_starts.append(self.view.line(line.begin()).begin())
+        regions = []
+        region = self.view.sel()[0]
+        for line in self.view.split_by_newlines(region):
+            point = self.view.line(line.begin()).begin()
+            regions.append(self.view.full_line(point))
+
+        return self.run_for_regions(regions)
+
+    def run_for_regions(self, regions):
         keep = []
         delete_regions = []
-        for point in line_starts:
-            line = self.view.full_line(point)
-            text = self.view.substr(line)
+        for region in regions:
+            text = self.view.substr(region)
             if text not in keep:
                 keep.append(text)
             else:
-                delete_regions.append(line)
+                delete_regions.append(region)
+
         if delete_regions:
             self.view.sel().clear()
             for region in delete_regions:
                 self.view.sel().add(region)
         else:
-            sublime.status_message('No duplicate lines found')
+            sublime.status_message('No duplicates found')
+
+
+class SimpleMovementCloseTagAndRestoreCursor(sublime_plugin.TextCommand):
+    def run(self, edit, prefix=""):
+        self.view.run_command('insert', {'characters': prefix})
+        cursor_position = self.view.sel()[0].begin()
+        # close the tag
+        self.view.run_command('close_tag')
+        self.view.sel().clear()
+        self.view.sel().add(sublime.Region(cursor_position, cursor_position))
+
+
+class SimpleMovementMagicInsert(sublime_plugin.TextCommand):
+    LOWERS = [c for c in 'abcdefghijklmnopqrstuvwxyz']
+    UPPERS = [c for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ']
+
+    def run(self, edit, insert):
+        if insert not in self.LOWERS:
+            sublime.status_message("Unexpected value {insert!r} in SimpleMovementMagicInsert".format(insert=insert))
+            return
+
+        if len(self.view.sel()) < 2:
+            self.view.run_command('insert', {"characters": insert})
+            return
+
+        regions = list(self.view.sel())
+        regions.sort(key=lambda region: region.end(), reverse=True)
+        for region in self.view.sel():
+            self.run_each(edit, region, insert=insert)
+        for region in self.view.sel():
+            self.view.sel().subtract(region)
+            self.view.sel().add(sublime.Region(region.end(), region.end()))
+
+    def run_each(self, edit, region, insert):
+        if not len(region):
+            self.view.insert(edit, region.begin(), insert)
+            return
+
+        if self.view.substr(region)[0] in self.UPPERS:
+            insert = insert.upper()
+        self.view.replace(edit, region, insert)
