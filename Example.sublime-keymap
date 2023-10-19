@@ -7,7 +7,9 @@
 
     // select next
     { "keys": ["super+d"], "command": "simple_movement_select_next" },
+    { "keys": ["super+shift+d"], "command": "simple_movement_select_next", "args": {"ignore_case": true} },
     { "keys": ["super+k", "super+d"], "command": "simple_movement_select_next", "args": {"remove_last": true} },
+    { "keys": ["super+shift+k", "super+shift+d"], "command": "simple_movement_select_next", "args": {"ignore_case": true, "remove_last": true} },
     { "keys": ["super+ctrl+g"], "command": "simple_movement_select_next", "args": {"select_all": true} },
 
     // dup line

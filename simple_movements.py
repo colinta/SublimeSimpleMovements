@@ -520,34 +520,32 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
         if len(regions) == 1 and len(regions[0]) == 0:
             self.view.run_command('expand_selection', {'to': 'word'})
         else:
-            previous_region = None
-            previous_match = None
+            matches = set()
+            last_region = regions[0]
             for region in regions:
                 match = self.view.substr(region)
-                self.select_next(region, match, previous_region, previous_match, select_all=select_all, ignore_case=ignore_case)
-                previous_region = region
-                previous_match = match
-            if remove_last:
-                self.view.sel().subtract(regions[0])
-            self.select_next(region, match, previous_region, previous_match, select_all=select_all, ignore_case=ignore_case)
+                matches.add(match)
 
-    def select_next(self, region, match, previous_region, previous_match, select_all, ignore_case):
-        if match == previous_match:
-            return
-
-        if select_all:
-            found_all = self.view.find_all(match, sublime.LITERAL | (ignore_case and sublime.IGNORECASE or 0))
-
-            for found in found_all:
-                self.view.sel().add(found)
-        else:
-            found = self.view.find(match, region.end(), sublime.LITERAL | (ignore_case and sublime.IGNORECASE or 0))
-
-            if found:
-                self.view.sel().add(found)
-                self.view.show(found)
+            if select_all:
+                for match in matches:
+                    found_all = self.view.find_all(match, sublime.LITERAL | (ignore_case and sublime.IGNORECASE or 0))
+                    self.view.sel().add_all(found_all)
             else:
-                sublime.status_message('Cound not find "{0}"'.format(match))
+                if remove_last:
+                    self.view.sel().subtract(last_region)
+
+                # from the last region, find the next match in matches
+                found_next = None
+                for match in matches:
+                    found = self.view.find(match, last_region.end(), sublime.LITERAL | (ignore_case and sublime.IGNORECASE or 0))
+                    if found_next is None or found.begin() < found_next.begin():
+                        found_next = found
+
+                if found_next:
+                    self.view.sel().add(found_next)
+                    self.view.show(found_next)
+                else:
+                    sublime.status_message('Cound not find "{0}"'.format('" or "'.join(matches)))
 
 
 class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
