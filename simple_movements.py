@@ -538,7 +538,7 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
                 found_next = None
                 for match in matches:
                     found = self.view.find(match, last_region.end(), sublime.LITERAL | (ignore_case and sublime.IGNORECASE or 0))
-                    if found_next is None or found.begin() < found_next.begin():
+                    if not found.empty() and (found_next is None or found.begin() < found_next.begin()):
                         found_next = found
 
                 if found_next:
