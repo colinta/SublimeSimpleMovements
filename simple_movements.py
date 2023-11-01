@@ -173,7 +173,7 @@ class SimpleMovementParseLineCommand(sublime_plugin.TextCommand):
             end = start + len(move_over.group(0))
 
         if start < 0 or end < 0 or start > self.view.size() or end > self.view.size():
-            sublime.status_message('Invalid entry')
+            self.view.show_popup('Invalid entry')
             self.restore()
             return
 
@@ -216,7 +216,7 @@ class SimpleMovementDuplicateLineCommand(SimpleMovementParseLineCommand):
                     line_a = self.get_line(lines)
                     line_b = line_a + 1
             except ValueError as e:
-                sublime.status_message('Invalid entry')
+                self.view.show_popup('Invalid entry')
                 return
 
             # get content between lines line_a and line_b
@@ -545,7 +545,7 @@ class SimpleMovementSelectNextCommand(sublime_plugin.TextCommand):
                     self.view.sel().add(found_next)
                     self.view.show(found_next)
                 else:
-                    sublime.status_message('Cound not find "{0}"'.format('" or "'.join(matches)))
+                    self.view.show_popup('Cound not find "{0}"'.format('" or "'.join(matches)))
 
 
 class SimpleMovementOneSelectionCommand(sublime_plugin.TextCommand):
@@ -623,7 +623,7 @@ class SimpleMovementRemoveDups(sublime_plugin.TextCommand):
             for region in delete_regions:
                 self.view.sel().add(region)
         else:
-            sublime.status_message('No duplicates found')
+            self.view.show_popup('No duplicates found')
 
 
 class SimpleMovementCloseTagAndRestoreCursor(sublime_plugin.TextCommand):
