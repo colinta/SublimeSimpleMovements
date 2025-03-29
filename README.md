@@ -75,11 +75,13 @@ Select a bunch of things that might be similar, then activate this command.  It
 will unselect the *first* of each unique item, leaving it up to you what to do
 with the duplicates.
 
-
 Installation
 ------------
 
-1. Using Package Control, install "SimpleMovement"
+Using Package Control, install "SimpleMovement" or clone this repo in your packages folder.
+
+I recommended you add key bindings for the commands. I've included my preferred bindings below.
+Copy them to your key bindings file (⌘⇧,).
 
 Commands
 --------
@@ -171,3 +173,105 @@ multiple cursors A LOT, and I love this command. I have it bound to
 
 `super+shift+1..0` unselects a cursor, usually I just need to use
 `super+shift+1` or `super+shift+0` to unselect the first or last cursor.
+
+Key Bindings
+------------
+
+Copy these to your user key bindings file.
+
+<!-- keybindings start -->
+    // remove duplicate lines
+    { "keys": ["f6"], "command": "simple_movement_remove_dups" },
+    // pageup/pagedown
+    { "keys": ["pageup"], "command": "simple_movement_page", "args": {"direction": "up"}},
+    { "keys": ["pagedown"], "command": "simple_movement_page", "args": {"direction": "down"}},
+
+    // select next
+    { "keys": ["super+d"], "command": "simple_movement_select_next" },
+    { "keys": ["super+shift+d"], "command": "simple_movement_select_next", "args": {"ignore_case": true} },
+    { "keys": ["super+k", "super+d"], "command": "simple_movement_select_next", "args": {"remove_last": true} },
+    { "keys": ["super+shift+k", "super+shift+d"], "command": "simple_movement_select_next", "args": {"ignore_case": true, "remove_last": true} },
+    { "keys": ["super+ctrl+g"], "command": "simple_movement_select_next", "args": {"select_all": true} },
+
+    // dup line
+    { "keys": ["super+shift+d"], "command": "simple_movement_duplicate_line" },
+
+    // controlling the cursor
+    { "keys": ["super+l"], "command": "simple_movement_goto_line" },
+    { "keys": ["ctrl+shift+b"], "command": "simple_movement_select_block" },
+    { "keys": ["super+ctrl+="], "command": "simple_movement_align_cursor" },
+    { "keys": ["super+ctrl+shift+="], "command": "simple_movement_align_cursor", "args": {"move": "left"} },
+    { "keys": ["super+ctrl+shift+alt+="], "command": "simple_movement_align_cursor", "args": {"move": "align"} },
+    { "keys": ["super+left"], "command": "simple_movement_bol", "args": {"extend": false} },
+    { "keys": ["super+shift+left"], "command": "simple_movement_bol", "args": {"extend": true} },
+    { "keys": ["super+right"], "command": "simple_movement_eol", "args": {"extend": false} },
+    { "keys": ["super+shift+right"], "command": "simple_movement_eol", "args": {"extend": true} },
+
+    // controlling the viewport
+    { "keys": ["super+alt+h"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "h", "ipp", "inl", "m", "mm"]} },
+    { "keys": ["super+alt+up"], "command": "simple_movement_move_viewport", "args": {"direction": "up"} },
+    { "keys": ["super+alt+down"], "command": "simple_movement_move_viewport", "args": {"direction": "down"} },
+    { "keys": ["super+alt+space"], "command": "simple_movement_move_viewport", "args": {"direction": "center"} },
+    { "keys": ["super+alt+shift+up"], "command": "simple_movement_move_viewport", "args": {"direction": "up", "factor": 5} },
+    { "keys": ["super+alt+shift+down"], "command": "simple_movement_move_viewport", "args": {"direction": "down", "factor": 5} },
+
+    // end a block of comments
+    { "keys": ["enter"], "command": "simple_movement_nl", "args": {"with_comment": true}, "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "comment" }
+        ]
+    },
+    { "keys": ["ctrl+enter"], "command": "simple_movement_nl", "args": {"unindent": true} },
+    { "keys": ["ctrl+enter"], "command": "simple_movement_nl", "args": {"with_comment": true, "unindent": true}, "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "comment" }
+        ]
+    },
+
+    // pressing enter
+    { "keys": ["alt+enter"], "command": "simple_movement_nl", "args": {"hard_nl": true} },
+    { "keys": ["ctrl+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true} },
+    { "keys": ["super+alt+enter"], "command": "simple_movement_nl", "args": {"with_terminator": true, "insert_nl": false} },
+    // these are built-in macros that work well.  they are probably already part of your Default Key Bindings.
+    // { "keys": ["super+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line.sublime-macro"} },
+    // { "keys": ["super+shift+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line Before.sublime-macro"} },
+
+    //|  insert literal characters
+    { "keys": ["ctrl+v","enter"], "command": "simple_movement_insert", "args": { "insert": "\n" } },
+    { "keys": ["ctrl+v","tab"], "command": "simple_movement_insert", "args": { "insert": "\t" } },
+    { "keys": ["ctrl+v","'"], "command": "simple_movement_insert", "args": { "insert": "'" } },
+    { "keys": ["ctrl+v","*"], "command": "simple_movement_insert", "args": { "insert": "*" } },
+    { "keys": ["ctrl+v","\""], "command": "simple_movement_insert", "args": { "insert": "\"" } },
+    { "keys": ["ctrl+v","`"], "command": "simple_movement_insert", "args": { "insert": "`" } },
+    { "keys": ["ctrl+9"], "command": "simple_movement_insert", "args": { "insert": "(" } },
+    { "keys": ["ctrl+v","("], "command": "simple_movement_insert", "args": { "insert": "(" } },
+    { "keys": ["ctrl+v",")"], "command": "simple_movement_insert", "args": { "insert": ")" } },
+    { "keys": ["ctrl+v","["], "command": "simple_movement_insert", "args": { "insert": "[" } },
+    { "keys": ["ctrl+v","]"], "command": "simple_movement_insert", "args": { "insert": "]" } },
+    { "keys": ["ctrl+v","{"], "command": "simple_movement_insert", "args": { "insert": "{" } },
+    { "keys": ["ctrl+v","}"], "command": "simple_movement_insert", "args": { "insert": "}" } },
+    { "keys": ["ctrl+v","“"], "command": "simple_movement_insert", "args": { "insert": "“" } },
+    { "keys": ["ctrl+v","‘"], "command": "simple_movement_insert", "args": { "insert": "‘" } },
+    { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },
+    { "keys": ["ctrl+v","alt+\\"], "command": "simple_movement_insert", "args": { "insert": "«" } },
+    { "keys": ["ctrl+v","#"], "command": "simple_movement_insert", "args": { "insert": "#" } },
+    { "keys": ["ctrl+v","="], "command": "simple_movement_insert", "args": { "insert": "=" } },
+    { "keys": ["ctrl+v","%"], "command": "simple_movement_insert", "args": { "insert": "%" } },
+    { "keys": ["ctrl+v","|"], "command": "simple_movement_insert", "args": { "insert": "|" } },
+    // this one doesn't work:
+    { "keys": ["ctrl+v","‹"], "command": "simple_movement_insert", "args": { "insert": "‹" } },
+
+    // choose a selection
+    { "keys": ["super+1"], "command": "simple_movement_one_selection", "args": { "index": 0 } },
+    { "keys": ["super+2"], "command": "simple_movement_one_selection", "args": { "index": 1 } },
+    { "keys": ["super+3"], "command": "simple_movement_one_selection", "args": { "index": 2 } },
+    { "keys": ["super+4"], "command": "simple_movement_one_selection", "args": { "index": 3 } },
+    { "keys": ["super+5"], "command": "simple_movement_one_selection", "args": { "index": 4 } },
+    { "keys": ["super+6"], "command": "simple_movement_one_selection", "args": { "index": 5 } },
+    { "keys": ["super+7"], "command": "simple_movement_one_selection", "args": { "index": 6 } },
+    { "keys": ["super+8"], "command": "simple_movement_one_selection", "args": { "index": 7 } },
+    { "keys": ["super+9"], "command": "simple_movement_one_selection", "args": { "index": 8 } },
+    { "keys": ["super+0"], "command": "simple_movement_one_selection", "args": { "index": -1 } },
+    { "keys": ["super+shift+1"], "command": "simple_movement_one_selection", "args": { "select": false, "index": 0 } },
+    { "keys": ["super+shift+0"], "command": "simple_movement_one_selection", "args": { "select": false, "index": -1 } },
+<!-- keybindings stop -->
