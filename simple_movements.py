@@ -471,7 +471,7 @@ class SimpleMovementNlCommand(sublime_plugin.TextCommand):
                 nl += indent
 
         if with_comment:
-            comment_range = self.view.find(r'\/?(#+|[*]|//+|--+|[\']+)\|? *', beginning_of_line)
+            comment_range = self.view.find(r'\/?(#+|[*]|//+|--+)\|? *', beginning_of_line)
             if comment_range:
                 if comment_range.end() == end_of_line and unindent:
                     # remove comment!
