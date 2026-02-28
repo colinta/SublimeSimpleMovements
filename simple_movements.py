@@ -30,9 +30,22 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
 
     def run_each(self, edit, region, extend=False):
         line = self.view.line(region.b)
-        new_point = line.begin()
+        wrap = self.view.settings().get('word_wrap')
+        if wrap:
+            cy = self.view.text_to_layout(region.b)[1]
+            lo, hi = line.begin(), region.b
+            while lo < hi:
+                mid = (lo + hi) // 2
+                if self.view.text_to_layout(mid)[1] == cy:
+                    hi = mid
+                else:
+                    lo = mid + 1
+            new_point = lo
+        else:
+            new_point = line.begin()
         if new_point == region.b:
             # already at BOL, skip to first character
+            new_point = line.begin()
             while self.view.substr(new_point) in [" ", "\t"]:
                 new_point += 1
         self.view.sel().subtract(region)
@@ -52,9 +65,15 @@ class SimpleMovementEolCommand(sublime_plugin.TextCommand):
 
     def run_each(self, edit, region, extend=False):
         line = self.view.line(region.b)
-        new_point = line.end()
+        wrap = self.view.settings().get('word_wrap')
+        if wrap:
+            layout_point = self.view.text_to_layout(region.b)
+            new_point = self.view.layout_to_text((1e9, layout_point[1]))
+            new_point = min(new_point, line.end())
+        else:
+            new_point = line.end()
         if new_point == region.b:
-            # already at EOL, skip to first character
+            # already at EOL, skip past trailing whitespace
             new_point = line.end()
             while self.view.substr(new_point - 1) in [" ", "\t"]:
                 new_point -= 1
