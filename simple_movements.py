@@ -31,6 +31,12 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
     def run_each(self, edit, region, extend=False):
         line = self.view.line(region.b)
         wrap = self.view.settings().get('word_wrap')
+
+        # find first non-whitespace of the actual line
+        first_nonws = line.begin()
+        while first_nonws < line.end() and self.view.substr(first_nonws) in [" ", "\t"]:
+            first_nonws += 1
+
         if wrap:
             cy = self.view.text_to_layout(region.b)[1]
             lo, hi = line.begin(), region.b
@@ -40,14 +46,27 @@ class SimpleMovementBolCommand(sublime_plugin.TextCommand):
                     hi = mid
                 else:
                     lo = mid + 1
-            new_point = lo
+            bol = lo
+
+            if bol > line.begin():
+                # On a non-first visual line: first go to visual bol, then to first_nonws
+                if region.b == bol:
+                    new_point = first_nonws
+                else:
+                    new_point = bol
+            else:
+                # On the first visual line: toggle between first_nonws and line.begin()
+                if region.b == line.begin():
+                    new_point = first_nonws
+                elif region.b == first_nonws:
+                    new_point = line.begin()
+                else:
+                    new_point = first_nonws
         else:
-            new_point = line.begin()
-        if new_point == region.b:
-            # already at BOL, skip to first character
-            new_point = line.begin()
-            while self.view.substr(new_point) in [" ", "\t"]:
-                new_point += 1
+            if region.b == first_nonws:
+                new_point = line.begin()
+            else:
+                new_point = first_nonws
         self.view.sel().subtract(region)
         if extend:
             region = sublime.Region(region.a, new_point)
@@ -66,17 +85,36 @@ class SimpleMovementEolCommand(sublime_plugin.TextCommand):
     def run_each(self, edit, region, extend=False):
         line = self.view.line(region.b)
         wrap = self.view.settings().get('word_wrap')
+
+        # find last non-whitespace of the actual line
+        last_nonws = line.end()
+        while last_nonws > line.begin() and self.view.substr(last_nonws - 1) in [" ", "\t"]:
+            last_nonws -= 1
+
         if wrap:
             layout_point = self.view.text_to_layout(region.b)
-            new_point = self.view.layout_to_text((1e9, layout_point[1]))
-            new_point = min(new_point, line.end())
+            eol = self.view.layout_to_text((1e9, layout_point[1]))
+            eol = min(eol, line.end())
+
+            if eol < line.end():
+                # On a non-last visual line: first go to visual eol, then to last_nonws
+                if region.b == eol:
+                    new_point = last_nonws
+                else:
+                    new_point = eol
+            else:
+                # On the last visual line: toggle between last_nonws and line.end()
+                if region.b == line.end():
+                    new_point = last_nonws
+                elif region.b == last_nonws:
+                    new_point = line.end()
+                else:
+                    new_point = last_nonws
         else:
-            new_point = line.end()
-        if new_point == region.b:
-            # already at EOL, skip past trailing whitespace
-            new_point = line.end()
-            while self.view.substr(new_point - 1) in [" ", "\t"]:
-                new_point -= 1
+            if region.b == last_nonws:
+                new_point = line.end()
+            else:
+                new_point = last_nonws
         self.view.sel().subtract(region)
         if extend:
             region = sublime.Region(region.a, new_point)
