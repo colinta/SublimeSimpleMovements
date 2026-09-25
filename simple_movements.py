@@ -666,12 +666,12 @@ class SimpleMovementRemoveDups(sublime_plugin.TextCommand):
         return self.run_for_regions(regions)
 
     def run_for_regions(self, regions):
-        keep = []
+        keep = set()
         delete_regions = []
         for region in regions:
             text = self.view.substr(region)
             if text not in keep:
-                keep.append(text)
+                keep.add(text)
             else:
                 delete_regions.append(region)
 
